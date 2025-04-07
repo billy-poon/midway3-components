@@ -1,0 +1,32 @@
+{
+  "name": "@midway3-components/data",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "typings": "index.d.ts",
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "index.d.ts"
+  ],
+  "scripts": {
+    "build": "rm -rf ./dist && tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Billy Poon",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/billy-poon/midway3-components"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@midwayjs/core": "3"
+  }
+}
