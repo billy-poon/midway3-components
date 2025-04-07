@@ -8,9 +8,11 @@
 
         "data": "pnpm -F @midway3-components/data",
         "data:build": "pnpm data build",
+        "data:publish": "pnpm data build && pnpm data publish --access public",
 
         "web": "pnpm -F @midway3-components/web",
         "web:build": "pnpm web build",
+        "web:publish": "pnpm web build && pnpm web publish --access public",
 
         "test": "echo \"Error: no test specified\" && exit 1"
     },
