@@ -163,16 +163,15 @@ export function ModelClass<T extends Class>(clz: T) {
         }
 
         async getValue(field: FieldDefinition, jsonData: any) {
-            let value = jsonData?.[field.propertyKey]
-            while (typeof value === 'function') {
-                value = value.call(this)
+            let result = await jsonData?.[field.propertyKey]
+            while (typeof result === 'function') {
+                result = await result.call(this)
             }
 
             if (typeof field.getValue === 'function') {
-                value = field.getValue(await value, field)
+                result = await field.getValue(result, field, this)
             }
 
-            const result = await value
             return result === undefined
                 ? field.defaultValue
                 : result

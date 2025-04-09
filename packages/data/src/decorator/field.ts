@@ -20,7 +20,7 @@ export interface FieldOptions<T = unknown> {
      * @param val the original value
      * @param definition the field definition
      */
-    getValue?(val: T, definition: FieldDefinition): unknown
+    getValue?(val: T, definition: FieldDefinition, target: any): unknown
     /**
      * The default value of this field if `undefined`
      */
