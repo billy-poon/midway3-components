@@ -9,7 +9,7 @@ export class SerializerService extends _SerializerService {
         if (sort === '0') {
             dataProvider.setSort(false)
         }
-        if (pagination === '') {
+        if (pagination === '0') {
             dataProvider.setPatination(false)
         }
 

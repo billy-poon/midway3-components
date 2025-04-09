@@ -3,8 +3,8 @@ import { AsyncLocalStorage } from 'async_hooks'
 
 const storage = new AsyncLocalStorage()
 
-export function getCurrentContext(): Context | null
-export function getCurrentContext(required: true): Context
+export function getCurrentContext<T extends Context = Context>(): T | null
+export function getCurrentContext<T extends Context = Context>(required: true): T
 export function getCurrentContext(required = false): Context | null {
     const result = storage.getStore() as Context
     if (result == null && required) {

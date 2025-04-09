@@ -2,12 +2,18 @@ import { SerializerService as BaseService } from '@midway3-components/data'
 import { AbstractModel, Pagination } from '@midway3-components/data/dist/data'
 import { BaseDataProvider } from '@midway3-components/data/dist/data/baseDataProvider'
 import { Config, Context, Inject, Provide } from '@midwayjs/core'
+import { Pagination as WebPagination } from '../data/pagination'
 import { RestSerializerOptions } from '../interface'
+import { Link } from '../link'
+import { UrlService } from './urlService'
 
 @Provide()
 export class SerializerService extends BaseService {
     @Inject()
     ctx: Context
+
+    @Inject()
+    urlService: UrlService
 
     @Config('data.serializer')
     serializerOptions: RestSerializerOptions
@@ -18,6 +24,13 @@ export class SerializerService extends BaseService {
 
     protected isHead() {
         return this.ctx.method?.toUpperCase() === 'HEAD'
+    }
+
+    protected getRequestedPagination(): Pagination {
+        const result = new WebPagination()
+        result.urlFactory = this.urlService.path(this.ctx.path!)
+
+        return result
     }
 
     protected async serializeDataProvider(dataProvider: BaseDataProvider): Promise<unknown> {
@@ -51,8 +64,25 @@ export class SerializerService extends BaseService {
     }
 
     protected serializePagination(pagination: Pagination) {
-        // TODO: serializePagination
-        return {}
+        const {
+            linksEnvelope = '',
+            metaEnvelope = '',
+        } = this.serializerOptions
+
+        const result: Record<string, unknown> = {}
+        if (linksEnvelope !== '' && pagination instanceof WebPagination) {
+            result[linksEnvelope] = Link.serialize(pagination.getLinks(true))
+        }
+        if (metaEnvelope !== '') {
+            result[metaEnvelope] = {
+                totalCount: pagination.totalCount,
+                pageCount: pagination.getPageCount(),
+                currentPage: pagination.getPage() + 1,
+                perPage: pagination.getPageSize()
+            }
+        }
+
+        return result
     }
 
     protected addPaginationHeaders(pagination: Pagination) {
@@ -70,8 +100,12 @@ export class SerializerService extends BaseService {
         this.ctx.set(currentPageHeader, pagination.getPage() + 1)
         this.ctx.set(perPageHeader, pagination.getPageSize())
 
-        // TODO: Link
-        // this.ctx.set('Link', pagination.getPageSize() + '')
+
+        if (pagination instanceof WebPagination) {
+            const items = Object.entries(pagination.getLinks(true))
+                .map(([k, v]) => `<${v}>; rel=${k}`)
+            this.ctx.set('Link', items.join(', '))
+        }
     }
 
     protected serializeModelErrors(model: AbstractModel) {

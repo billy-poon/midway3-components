@@ -12,6 +12,11 @@ export default {
     koa: {
         port: 7001,
     },
+    data: {
+        serializer: {
+            collectionEnvelope: 'data',
+        },
+    },
     sequelize: {
         dataSource: {
             default: {

@@ -1,4 +1,4 @@
-import { getCurrentApplicationContext, Init, MidwayWebRouterService, Provide, RequestMethod, RouterInfo } from '@midwayjs/core'
+import { getCurrentApplicationContext, Init, MidwayWebRouterService, Provide, RouterInfo } from '@midwayjs/core'
 import { dasherize } from 'inflected'
 import { ParsedUrlQueryInput, stringify } from 'querystring'
 import { getCurrentContext } from '../middleware/context.middleware'
@@ -18,7 +18,15 @@ type ActionOf<T extends Controller> = keyof {
     ]: unknown
 }
 
-type RequestMethod = Lowercase<keyof typeof RequestMethod>
+// type RequestMethod = Lowercase<keyof typeof RequestMethod>
+// function matchMethod(requestMethod: RequestMethod, routeMethod?: RequestMethod) {
+//     requestMethod = requestMethod.toLowerCase() as RequestMethod
+//     if (routeMethod !== requestMethod) {
+//         return routeMethod == null || routeMethod === 'all'
+//     }
+
+//     return true
+// }
 
 declare module '@midwayjs/core' {
     interface RouterInfo {
@@ -36,12 +44,11 @@ type RouteOptions = {
     query?: ParsedUrlQueryInput
 }
 
-type ActionFactoryOf<C extends Controller> = (action: ActionOf<C>) => RouteFactory
-type RouteFactory = (options?: RouteOptions) => string
+type ActionFactoryOf<C extends Controller> = (action: ActionOf<C>) => UrlFactory
+export type UrlFactory = (options?: RouteOptions) => string
 
 @Provide()
 export class UrlService {
-
     @Init()
     async init() {
         const routerService = await getCurrentApplicationContext()
@@ -72,7 +79,7 @@ export class UrlService {
         })
     }
 
-    _routes?: RouterInfo[]
+    private _routes?: RouterInfo[]
     getRoutes() {
         return this._routes ?? []
     }
@@ -81,7 +88,7 @@ export class UrlService {
         const clz = typeof ctrl === 'function' ? ctrl : ctrl.constructor
         const routes = this.getRoutes().filter(v => v.controllerClz === clz)
 
-        return (action): RouteFactory => {
+        return (action): UrlFactory => {
             const route = routes.find(x => x.method === action)
             if (route == null) {
                 throw new Error(`Failed to resolve route for [${clz.name}::${String(action)}]`)
@@ -91,31 +98,39 @@ export class UrlService {
         }
     }
 
-    action<T extends Controller>(ctrl: T | ControllerClass<T>, action: ActionOf<T>): RouteFactory {
+    action<T extends Controller>(ctrl: T | ControllerClass<T>, action: ActionOf<T>): UrlFactory {
         const factory = this.controller(ctrl)
         return factory(action)
     }
 
-    to(routeKey: string, options?: RouteOptions): string
-    to<T extends Controller>(routeKey: [T | ControllerClass<T>, ActionOf<T>], options?: RouteOptions): string
-    to(x: unknown, y?: RouteOptions) {
+    path(path: string): UrlFactory {
+        return (options) => this.build(path, options)
+    }
+
+    to(path?: string, options?: RouteOptions): string
+    to<T extends Controller>(route: [T | ControllerClass<T>, ActionOf<T>], options?: RouteOptions): string
+    to(x?: unknown, y?: RouteOptions) {
         if (Array.isArray(x)) {
             const [ctrl, action] = x as [Controller, ActionOf<Controller>]
             const factory = this.action(ctrl, action)
             return factory(y)
         }
 
-        const routeKey = x as string
-        const route = this.getRoutes().find(x => x.keys?.routeKey === routeKey)
-        if (route == null) {
-            throw new Error(`Failed to resolve route [${routeKey}]`)
-        }
+        // const routeKey = x as string
+        // const route = this.getRoutes().find(x => x.keys?.routeKey === routeKey)
+        // if (route == null) {
+        //     throw new Error(`Failed to resolve route [${routeKey}]`)
+        // }
 
-        return this.build(route, y)
+        // return this.build(route, y)
+        const path = x ?? getCurrentContext(true).path
+        return this.build(path as string, y)
     }
 
-    protected build(route: RouterInfo, options?: RouteOptions) {
-        let result = route.fullUrl ?? ''
+    protected build(route?: string | RouterInfo, options?: RouteOptions) {
+        let result = (typeof route === 'object'
+            ? route?.fullUrl : route) ?? ''
+
         const { scheme, params, query } = options ?? {}
         if (params != null) {
             result = template(result, (key, match) => {
@@ -128,7 +143,7 @@ export class UrlService {
         if (query != null) {
             const search = stringify(query)
             if (search !== '') {
-                result += '?' + search
+                result += result.includes('?') ? '&' : '?' + search
             }
         }
 
