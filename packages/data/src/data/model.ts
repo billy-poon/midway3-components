@@ -33,6 +33,7 @@ const classType = Symbol('class-type:model')
 
 export function ModelClass<T extends Class>(clz: T) {
     return class extends clz {
+        /** @internal */
         static classType() {
             return classType
         }
