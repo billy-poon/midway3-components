@@ -1,4 +1,5 @@
 import * as data from '@midway3-components/data'
+import * as drizzle from '@midway3-components/drizzle'
 import * as web from '@midway3-components/web'
 import { App, Configuration, ILifeCycle } from '@midwayjs/core'
 import * as info from '@midwayjs/info'
@@ -17,6 +18,7 @@ import { registerSerializerService } from './service/serializer.service'
         data,
         web,
         validate,
+        drizzle,
         sequelize,
         {
             component: info,

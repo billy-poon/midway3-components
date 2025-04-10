@@ -1,7 +1,7 @@
 import { ActiveDataProvider } from '@midway3-components/data'
 import { Controller, Get, Param, Query } from '@midwayjs/core'
 import { Op } from 'sequelize'
-import { ActiveQuery } from '../../db/activeQuery'
+import { SequelizeActiveQuery } from '../../db/sequelizeActiveQuery'
 import { Country } from '../../entity/country.entity'
 
 @Controller('/api/country')
@@ -11,7 +11,7 @@ export class CountryController {
         @Query('q')
         keyword: string = ''
     ) {
-        const query = ActiveQuery
+        const query = SequelizeActiveQuery
             .create(Country)
             // .orderBy({ country_id: 'asc' })
 

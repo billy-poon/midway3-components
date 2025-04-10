@@ -13,9 +13,8 @@ export interface QueryInterface<T> {
     all(): Promise<T[]>
     one(): Promise<T | null>
     count(q?: string): Promise<number>
-    exists(): Promise<boolean>
 
-    clone(): this
+    clone?(): this
 }
 
 export class ActiveDataProvider<T = unknown> extends BaseDataProvider<T> {
@@ -30,7 +29,7 @@ export class ActiveDataProvider<T = unknown> extends BaseDataProvider<T> {
     }
 
     protected async prepareModels(): Promise<T[]> {
-        const query = this.query.clone()
+        const { query } = this
         const pagination = this.getPagination()
         if (pagination !== false) {
             pagination.totalCount = await this.getTotalCount()
@@ -53,11 +52,13 @@ export class ActiveDataProvider<T = unknown> extends BaseDataProvider<T> {
     }
 
     protected async prepareTotalCount(): Promise<number> {
-        const query = this.query
-            .clone()
-            .offset(null)
-            .limit(null)
-            .orderBy(null)
+        let { query } = this
+        if (typeof query.clone === 'function') {
+            query = query.clone()
+                .offset(null)
+                .limit(null)
+                .orderBy(null)
+        }
 
         return query.count()
     }

@@ -9,6 +9,8 @@
 
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
+
+        "noUnusedLocals": true
     },
     "exclude": [
         "dist",

@@ -1,10 +1,24 @@
 import { getCurrentContext } from '@midway3-components/web'
 import { getCurrentMainApp, MidwayConfig } from '@midwayjs/core'
 import { config } from 'dotenv'
+import { Logger } from 'drizzle-orm'
 
 config({
     path: ['.env', `.env-${process.env.NODE_ENV}`]
 })
+
+const { DB_USER, DB_PASS } = process.env
+
+function drizzleLogger(dataSourceName: string): Logger {
+    return {
+        logQuery(query: string, params: unknown) {
+            const logger = getCurrentContext()?.getLogger()
+                ?? getCurrentMainApp().getLogger()
+
+            logger.info(`[drizzle:${dataSourceName}] %s\n%o`, query, params)
+        }
+    }
+}
 
 export default {
     // use for cookie sign key, should change to your own and keep security
@@ -17,15 +31,29 @@ export default {
             collectionEnvelope: 'data',
         },
     },
+    drizzle: {
+        dataSource: {
+            postgres: {
+                // https://wiki.postgresql.org/wiki/Sample_Databases
+                connection: `postgres://${DB_USER}:${DB_PASS}@localhost/pagila`,
+                logger: drizzleLogger('postgres'),
+            },
+            mysql: {
+                // https://dev.mysql.com/doc/sakila/en/sakila-installation.html
+                type: 'mysql',
+                connection: `mysql://${DB_USER}:${DB_PASS}@localhost/sakila`,
+                logger: drizzleLogger('mysql'),
+            }
+        }
+    },
     sequelize: {
         dataSource: {
             default: {
                 dialect: 'postgres',
                 host: 'localhost',
-                // cSpell: ignore pagila
                 database: 'pagila',
-                username: process.env.DB_USER,
-                password: process.env.DB_PASS,
+                username: DB_USER,
+                password: DB_PASS,
 
                 entities: [
                     'entity'
