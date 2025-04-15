@@ -5,6 +5,7 @@ import { App, Configuration, ILifeCycle } from '@midwayjs/core'
 import * as info from '@midwayjs/info'
 import * as koa from '@midwayjs/koa'
 import * as sequelize from '@midwayjs/sequelize'
+import * as typeorm from '@midwayjs/typeorm'
 import * as validate from '@midwayjs/validate'
 import { join } from 'path'
 // import { DefaultErrorFilter } from './filter/default.filter';
@@ -18,6 +19,7 @@ import { registerSerializerService } from './service/serializer.service'
         data,
         web,
         validate,
+        typeorm,
         drizzle,
         sequelize,
         {

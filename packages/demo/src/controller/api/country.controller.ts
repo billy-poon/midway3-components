@@ -1,8 +1,8 @@
 import { ActiveDataProvider } from '@midway3-components/data'
+import { ActiveQuery } from '@midway3-components/data/dist/sequelize'
 import { Controller, Get, Param, Query } from '@midwayjs/core'
 import { Op } from 'sequelize'
-import { SequelizeActiveQuery } from '../../db/sequelizeActiveQuery'
-import { Country } from '../../entity/country.entity'
+import { Country } from '../../entity/country.sequelize'
 
 @Controller('/api/country')
 export class CountryController {
@@ -11,9 +11,8 @@ export class CountryController {
         @Query('q')
         keyword: string = ''
     ) {
-        const query = SequelizeActiveQuery
+        const query = ActiveQuery
             .create(Country)
-            // .orderBy({ country_id: 'asc' })
 
         if (keyword !== '') {
             query.where({
@@ -23,11 +22,7 @@ export class CountryController {
             })
         }
 
-        const result = ActiveDataProvider.create(query)
-        // result.setSort(false)
-        // result.setPatination(false)
-
-        return result
+        return ActiveDataProvider.create(query)
     }
 
     @Get('/:id')

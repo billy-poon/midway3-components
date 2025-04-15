@@ -28,6 +28,10 @@ export type QuerySession = {
 type ActiveRecord<Q extends Query<any>> = Awaited<ReturnType<Q['execute']>>[number]
 
 export class ActiveQuery<Q extends Query<any>> implements QueryInterface<ActiveRecord<Q>> {
+    static create<Q extends Query<any>>(query: Q) {
+        return new ActiveQuery(query)
+    }
+
     constructor(
         readonly query: Q
     ) { }

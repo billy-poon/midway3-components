@@ -16,7 +16,7 @@ export interface FieldOptions<T = unknown> {
      */
     hidden?: boolean
     /**
-     * Transform before serializing, can be awaitable
+     * Transform before serializing, promise is supported
      * @param val the original value
      * @param definition the field definition
      */
@@ -36,7 +36,7 @@ export interface FieldDefinition extends FieldOptions {
 
 const key = Symbol('decorator-key:field')
 export function Field(name: string): PropertyDecorator
-export function Field(expand: true): PropertyDecorator
+export function Field(extra: true): PropertyDecorator
 export function Field(options?: FieldOptions): PropertyDecorator
 export function Field(x?: unknown): PropertyDecorator {
     const options: FieldOptions = x == null

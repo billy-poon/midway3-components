@@ -32,6 +32,9 @@ export default {
         },
     },
     drizzle: {
+        default: {
+            casing: 'snake_case',
+        },
         dataSource: {
             postgres: {
                 // https://wiki.postgresql.org/wiki/Sample_Databases
@@ -46,6 +49,22 @@ export default {
             }
         }
     },
+    typeorm: {
+        dataSource: {
+            default: {
+                type: 'mysql',
+                host: 'localhost',
+                database: 'sakila',
+                username: DB_USER,
+                password: DB_PASS,
+
+                entities: ['entity/**/*.typeorm.{j,t}s'],
+
+                logger: 'advanced-console',
+                logging: 'all',
+            }
+        }
+    },
     sequelize: {
         dataSource: {
             default: {
@@ -55,9 +74,7 @@ export default {
                 username: DB_USER,
                 password: DB_PASS,
 
-                entities: [
-                    'entity'
-                ],
+                entities: ['entity/**/*.sequelize.{j,t}s'],
 
                 logging(sql: string, options: unknown) {
                     const logger = getCurrentContext()?.getLogger()

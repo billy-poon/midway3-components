@@ -25,12 +25,12 @@ export class ActorController {
             ? await this.mysqlQuery()
             : await this.pgQuery()
 
-        const query = new ActiveQuery(select)
+        const query = ActiveQuery.create(select)
 
         if (keyword !== '') {
             select.where(or(
-                like(table.first_name, `%${keyword}%`),
-                like(table.last_name, `%${keyword}%`),
+                like(table.firstName, `%${keyword}%`),
+                like(table.lastName, `%${keyword}%`),
             ))
         }
 

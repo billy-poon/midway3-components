@@ -13,6 +13,7 @@
     "@midwayjs/koa": "^3.12.0",
     "@midwayjs/logger": "^3.1.0",
     "@midwayjs/sequelize": "^3.20.3",
+    "@midwayjs/typeorm": "^3.20.4",
     "@midwayjs/validate": "^3.12.0",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
@@ -20,7 +21,8 @@
     "mysql2": "^3.14.0",
     "pg": "^8.14.1",
     "sequelize": "^6.37.7",
-    "sequelize-typescript": "^2.1.6"
+    "sequelize-typescript": "^2.1.6",
+    "typeorm": "^0.3.22"
   },
   "devDependencies": {
     "@midwayjs/mock": "^3.12.0",
