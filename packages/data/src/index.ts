@@ -4,5 +4,6 @@ export * from './decorator/field'
 export * from './decorator/sortable'
 export * from './interface'
 export * from './service/serializerService'
+export * from './utils'
 
 export { ComponentConfiguration as Configuration } from './configuration'
