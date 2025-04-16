@@ -1,15 +1,11 @@
-import { QueryInterface, SortableOptions } from '@midway3-components/data'
+import { getSortableOptions, QueryInterface, SortableOptions } from '@midway3-components/data'
 import { ORDER } from '@midway3-components/data/dist/data'
-import { desc, Placeholder, SQL, sql, SQLWrapper } from 'drizzle-orm'
-
-interface Query<T> {
-    where(where?: SQL): any
-    limit(limit: number | Placeholder): any
-    offset(offset: number | Placeholder): any
-    orderBy(...items: SQL[]): any
-
-    execute(): T[] | Promise<T[]>
-}
+import { isClass } from '@midwayjs/core/dist/util/types'
+import { asc, desc, Placeholder, SQL, sql, SQLWrapper } from 'drizzle-orm'
+import { EntityClass } from './decorator/entity'
+import { Query } from './interface'
+import { entityQuery } from './query'
+import { isDrizzleColumn } from './utils'
 
 export type QueryConfig = {
     fields?: Record<string, unknown>
@@ -28,12 +24,20 @@ export type QuerySession = {
 type ActiveRecord<Q extends Query<any>> = Awaited<ReturnType<Q['execute']>>[number]
 
 export class ActiveQuery<Q extends Query<any>> implements QueryInterface<ActiveRecord<Q>> {
-    static create<Q extends Query<any>>(query: Q) {
-        return new ActiveQuery(query)
+    static create<T extends object>(entityClz: EntityClass<T>): ActiveQuery<Query<T>>
+    static create<Q extends Query<any>>(query: Q): ActiveQuery<Q>
+    static create(x: any) {
+        const modelClass = isClass(x) ? x : undefined
+        const query: Query<any> = isClass(x)
+            ? entityQuery(x)
+            : x
+
+        return new ActiveQuery(query, modelClass)
     }
 
     constructor(
-        readonly query: Q
+        readonly query: Q,
+        readonly modelClass?: EntityClass<ActiveRecord<Q>>
     ) { }
 
     protected getConfig(): QueryConfig {
@@ -65,11 +69,19 @@ export class ActiveQuery<Q extends Query<any>> implements QueryInterface<ActiveR
 
     orderBy(value: Record<string, ORDER> | null): this {
         if (value != null) {
+            const fields = this.getConfig().fields ?? {}
             const items = Object.entries(value)
                 .map(([k, v]) => {
-                    const column = sql.raw(k)
+                    const field = fields[k]
+                    const column = field != null
+                        ? (isDrizzleColumn(field)
+                            ?  field
+                            : sql.raw((Object.keys(fields).indexOf(k) + 1) + '')
+                        )
+                        : sql.raw(k)
+
                     return v === 'desc'
-                        ? desc(column) : column
+                        ? desc(column) : asc(column)
                 })
             this.query.orderBy(...items)
         } else {
@@ -94,8 +106,16 @@ export class ActiveQuery<Q extends Query<any>> implements QueryInterface<ActiveR
     }
 
     sortableOptions(): SortableOptions<ActiveRecord<Q>> {
-        const fields = Object.keys(this.getConfig().fields ?? {})
-        return { attributes: fields as any }
+        const { modelClass } = this
+        const result = modelClass != null
+            ? getSortableOptions(modelClass)
+            : {}
+
+        if ((result.attributes ?? []).length == 0) {
+            result.attributes = Object.keys(this.getConfig().fields ?? {}) as any
+        }
+
+        return result
     }
 
     async all(): Promise<ActiveRecord<Q>[]> {

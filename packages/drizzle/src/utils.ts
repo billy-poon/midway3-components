@@ -1,13 +1,18 @@
-import { Drizzle, LibSQLDrizzle, MySQL2Drizzle, PostgresDrizzle, Schema } from './interface'
+import { Column } from 'drizzle-orm'
+import { LibSQLDrizzle, MySQL2Drizzle, PostgresDrizzle } from './interface'
 
-export function isMySQL<T extends Schema>(drizzle: Drizzle<T>): drizzle is MySQL2Drizzle<T> {
+export function isMySQL(drizzle: object): drizzle is MySQL2Drizzle {
     return drizzle.constructor?.name === 'MySql2Database'
 }
 
-export function isPostgres<T extends Schema>(drizzle: Drizzle<T>): drizzle is PostgresDrizzle<T> {
+export function isPostgres(drizzle: object): drizzle is PostgresDrizzle {
     return drizzle.constructor?.name === 'NodePgDatabase'
 }
 
-export function isLibSQL<T extends Schema>(drizzle: Drizzle<T>): drizzle is LibSQLDrizzle<T> {
+export function isLibSQL(drizzle: object): drizzle is LibSQLDrizzle {
     return drizzle.constructor?.name === 'LibSQLDatabase'
+}
+
+export function isDrizzleColumn(column: unknown): column is Column<any> {
+    return column instanceof Column
 }

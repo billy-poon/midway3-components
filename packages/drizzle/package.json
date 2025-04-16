@@ -33,29 +33,7 @@
   "dependencies": {
     "@midway3-components/data": "workspace:^",
     "@midwayjs/core": "3",
+    "class-transformer": "^0.5.1",
     "drizzle-orm": "^0.41.0"
-  },
-  "peerDependencies": {
-    "@libsql/client": "^0.15.2",
-    "@types/pg": "^8.11.11",
-    "mysql2": "^3.14.0",
-    "pg": "^8.14.1"
-  },
-  "peerDependenciesMeta": {
-    "@libsql/client": {
-      "optional": true
-    },
-    "@types/pg": {
-      "optional": true
-    },
-    "mysql2": {
-      "optional": true
-    },
-    "pg": {
-      "optional": true
-    },
-    "sqlite3": {
-      "optional": true
-    }
   }
 }

@@ -1,4 +1,4 @@
-type Awaitable<T> = T | PromiseLike<T>
+export type Awaitable<T> = T | PromiseLike<T>
 
 export type RequestParameters = Record<string, unknown>
 export type ParametersFactory = () => Awaitable<RequestParameters>

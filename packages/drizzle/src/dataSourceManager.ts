@@ -1,4 +1,4 @@
-import { Config, DataSourceManager, ILogger, Init, Inject, Logger, Provide, Scope, ScopeEnum } from '@midwayjs/core'
+import { Config, DataSourceManager, getCurrentApplicationContext, ILogger, Init, Inject, Logger, Provide, Scope, ScopeEnum } from '@midwayjs/core'
 import { ConfigurationOptions, Drizzle, DrizzleDataSourceOptions } from './interface'
 
 @Provide()
@@ -31,7 +31,7 @@ export class DrizzleDataSourceManager extends DataSourceManager<Drizzle> {
         let factory: (options: DrizzleDataSourceOptions) => Drizzle | Promise<Drizzle>
         if (type === 'mysql') {
             const { create } = await import('./mysql2')
-            factory = create
+            factory = create as any
         } else if (type === 'postgres') {
             const { create } = await import('./postgres')
             factory = create
@@ -77,4 +77,11 @@ export class DrizzleDataSourceManager extends DataSourceManager<Drizzle> {
 
 function hasMethod<T extends PropertyKey>(val: any, name: T): val is { [K in T]: () => unknown } {
     return typeof val?.[name] === 'function'
+}
+
+export function getDataSource(dataSourceName?: string) {
+    const service = getCurrentApplicationContext()
+        .get(DrizzleDataSourceManager)
+
+    return service.getDataSource(dataSourceName ?? service.getDefaultDataSourceName())
 }
