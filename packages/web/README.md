@@ -1,6 +1,6 @@
-# `@midway3-components/data`
+# @midway3-components/web
 
-Some util classes for [`Midway.js`](https://www.midwayjs.org/).
+Some util codes for [`Midway.js`](https://www.midwayjs.org/).
 
 ## Demo
 See [`@midway-components/demo`](https://github.com/billy-poon/midway3-components/tree/main/packages/demo) for full example.

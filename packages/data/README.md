@@ -1,4 +1,4 @@
-# `@midway3-components/data`
+# @midway3-components/data
 
 Make JSON serializing easier for [`Midway.js`](https://www.midwayjs.org/).
 
