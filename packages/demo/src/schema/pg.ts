@@ -31,3 +31,9 @@ export const addressTable = pgTable('address', {
     phone: text().notNull(),
     lastUpdate: timestamp(),
 })
+
+export const categoryTable = pgTable('category', {
+    category_id: serial().primaryKey(),
+    name: text().notNull(),
+    lastUpdate: timestamp(),
+})

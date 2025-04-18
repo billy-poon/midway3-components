@@ -18,7 +18,7 @@
         "drizzle:build": "pnpm drizzle build",
         "drizzle:publish": "pnpm drizzle build && pnpm drizzle publish --access public",
 
-        "build": "pnpm data:build && pnpm web:build && pnpm drizzle:build",
+        "build": "pnpm data:build && pnpm web:build && pnpm drizzle:build && pnpm demo:build",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "devDependencies": {

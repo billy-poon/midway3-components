@@ -3,8 +3,8 @@ import type { DrizzleConfig } from 'drizzle-orm'
 import type { LibSQLDatabase } from 'drizzle-orm/libsql'
 import type { Schema } from '../interface'
 
-export type LibSQLDataSourceOptions<TSchema extends Schema = Schema> =
-    & { type: 'libsql' }
+export type SQLiteDataSourceOptions<TSchema extends Schema = Schema> =
+    & { type: 'sqlite' }
     & DrizzleConfig<TSchema>
     & ({
         connection: string | Config
@@ -12,6 +12,6 @@ export type LibSQLDataSourceOptions<TSchema extends Schema = Schema> =
         client: Client
     })
 
-export type LibSQLDrizzle<TSchema extends Schema = Schema> = LibSQLDatabase<TSchema> & {
+export type SQLiteDrizzle<TSchema extends Schema = Schema> = LibSQLDatabase<TSchema> & {
     $client: Client
 }

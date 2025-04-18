@@ -37,7 +37,7 @@ export function entityQuery<T extends object>(clz: EntityClass<T>, dataSource?: 
     // if (!isPostgres(drizzle)) return;
 
     const result = drizzle.select(fields as Fields)
-        .from<T>(from)
+        .from(from)
 
     const { joins = [] } = options ?? {}
     if (joins.length > 0) {

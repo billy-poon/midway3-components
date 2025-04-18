@@ -1,5 +1,5 @@
 import { Config, DataSourceManager, getCurrentApplicationContext, ILogger, Init, Inject, Logger, Provide, Scope, ScopeEnum } from '@midwayjs/core'
-import { ConfigurationOptions, Drizzle, DrizzleDataSourceOptions } from './interface'
+import { ConfigurationOptions, DialectType, Drizzle, DrizzleDataSourceOptions } from './interface'
 
 @Provide()
 @Scope(ScopeEnum.Singleton)
@@ -27,19 +27,26 @@ export class DrizzleDataSourceManager extends DataSourceManager<Drizzle> {
     }
 
     protected async createDataSource(config: DrizzleDataSourceOptions, dataSourceName: string): Promise<void | Drizzle> {
-        const { type = 'postgres' } = config
+        type PlainOptions = {
+            type?: DialectType
+            connection?: string
+        }
+        const { type, connection } = config as PlainOptions
+        const theType = type != null
+            ? type : parseType(connection ?? '')
+
         let factory: (options: DrizzleDataSourceOptions) => Drizzle | Promise<Drizzle>
-        if (type === 'mysql') {
-            const { create } = await import('./mysql2')
+        if (theType === 'mysql') {
+            const { create } = await import('./mysql')
             factory = create as any
-        } else if (type === 'postgres') {
-            const { create } = await import('./postgres')
-            factory = create
-        } else if (type === 'libsql') {
-            const { create } = await import('./libsql')
-            factory = create
+        } else if (theType === 'postgresql') {
+            const { create } = await import('./postgresql')
+            factory = create as any
+        } else if (theType === 'sqlite') {
+            const { create } = await import('./sqlite')
+            factory = create as any
         } else {
-            throw new Error('Unsupported data source type: ' + type)
+            throw new Error('Unsupported data source type: ' + theType)
         }
 
         const result = await factory(config)
@@ -51,7 +58,7 @@ export class DrizzleDataSourceManager extends DataSourceManager<Drizzle> {
     protected async checkConnected(dataSource: Drizzle): Promise<boolean> {
         try {
             const client = dataSource.$client
-            if (hasMethod(client, 'connect')) {
+            if (typeof client.connect === 'function') {
                 await client.connect()
             }
             return true
@@ -64,9 +71,9 @@ export class DrizzleDataSourceManager extends DataSourceManager<Drizzle> {
     protected async destroyDataSource(dataSource: Drizzle): Promise<void> {
         try {
             const client = dataSource.$client
-            if (hasMethod(client, 'end')) {
+            if (typeof client.end === 'function') {
                 await client.end()
-            } else if (hasMethod(client, 'close')) {
+            } else if (typeof client.close === 'function') {
                 await client.close()
             }
         } catch (err) {
@@ -75,13 +82,26 @@ export class DrizzleDataSourceManager extends DataSourceManager<Drizzle> {
     }
 }
 
-function hasMethod<T extends PropertyKey>(val: any, name: T): val is { [K in T]: () => unknown } {
-    return typeof val?.[name] === 'function'
+function parseType(connection: string): DialectType {
+    const [, dialect] = /^(\w+):\/\//.exec(connection.toLowerCase()) ?? []
+    if (dialect === 'postgres') {
+        return 'postgresql'
+    } else if (dialect === 'file') {
+        return 'sqlite'
+    }
+
+    return (dialect ?? 'unknown') as DialectType
 }
 
 export function getDataSource(dataSourceName?: string) {
     const service = getCurrentApplicationContext()
         .get(DrizzleDataSourceManager)
 
-    return service.getDataSource(dataSourceName ?? service.getDefaultDataSourceName())
+    const name = dataSourceName ?? service.getDefaultDataSourceName()
+    const result = service.getDataSource(name)
+    if (result == null) {
+        throw new Error('Failed to get data source: ' + name)
+    }
+
+    return result
 }

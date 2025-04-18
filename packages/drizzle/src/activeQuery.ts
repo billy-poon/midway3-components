@@ -1,9 +1,11 @@
-import { getSortableOptions, QueryInterface, SortableOptions } from '@midway3-components/data'
+import { Class, getSortableOptions, QueryInterface, SortableOptions } from '@midway3-components/data'
 import { ORDER } from '@midway3-components/data/dist/data'
 import { isClass } from '@midwayjs/core/dist/util/types'
+import { plainToInstance } from 'class-transformer'
 import { asc, desc, Placeholder, SQL, sql, SQLWrapper } from 'drizzle-orm'
 import { EntityClass } from './decorator/entity'
-import { Query } from './interface'
+import { triggerOnLoad } from './decorator/load'
+import { Query, QueryResult } from './interface'
 import { entityQuery } from './query'
 import { isDrizzleColumn } from './utils'
 
@@ -21,11 +23,9 @@ export type QuerySession = {
 }
 
 
-type ActiveRecord<Q extends Query<any>> = Awaited<ReturnType<Q['execute']>>[number]
-
-export class ActiveQuery<Q extends Query<any>> implements QueryInterface<ActiveRecord<Q>> {
+export class ActiveQuery<T extends object> implements QueryInterface<T> {
     static create<T extends object>(entityClz: EntityClass<T>): ActiveQuery<Query<T>>
-    static create<Q extends Query<any>>(query: Q): ActiveQuery<Q>
+    static create<Q extends Query>(query: Q): ActiveQuery<QueryResult<Q>>
     static create(x: any) {
         const modelClass = isClass(x) ? x : undefined
         const query: Query<any> = isClass(x)
@@ -36,9 +36,13 @@ export class ActiveQuery<Q extends Query<any>> implements QueryInterface<ActiveR
     }
 
     constructor(
-        readonly query: Q,
-        readonly modelClass?: EntityClass<ActiveRecord<Q>>
-    ) { }
+        readonly query: Query<T>,
+        readonly modelClass?: EntityClass<T>
+    ) {
+        if (modelClass != null) {
+            patchQuery(query, modelClass)
+        }
+    }
 
     protected getConfig(): QueryConfig {
         return this.query['config'] ?? {}
@@ -105,7 +109,7 @@ export class ActiveQuery<Q extends Query<any>> implements QueryInterface<ActiveR
         return this
     }
 
-    sortableOptions(): SortableOptions<ActiveRecord<Q>> {
+    sortableOptions(): SortableOptions<T> {
         const { modelClass } = this
         const result = modelClass != null
             ? getSortableOptions(modelClass)
@@ -118,11 +122,11 @@ export class ActiveQuery<Q extends Query<any>> implements QueryInterface<ActiveR
         return result
     }
 
-    async all(): Promise<ActiveRecord<Q>[]> {
+    async all(): Promise<T[]> {
         return this.query.execute()
     }
 
-    async one(): Promise<ActiveRecord<Q>> {
+    async one(): Promise<T> {
         const [row] = await this.limit(1).all()
         return row ?? null
     }
@@ -140,4 +144,35 @@ export class ActiveQuery<Q extends Query<any>> implements QueryInterface<ActiveR
         const command = sql`select count(*) as count from (${this.query}) as __`
         return this.getSession().count(command)
     }
+}
+type Executable = {
+    execute(...args: any): any
+}
+
+const FLAG = Symbol('activeQuery::patchQuery')
+function patchQuery<T extends Executable>(query: T, modelClass: Class): T {
+    const original = query.execute
+    if (original[FLAG] === undefined) {
+        const execute = async (...args: any) => {
+            const result = await original.call(query, ...args)
+            if (Array.isArray(result) && result.length > 0) {
+                const models = plainToInstance(modelClass, result)
+
+                const entities = models.map((entry, i) => ({
+                    entry,
+                    data: result[i]
+                }))
+                await triggerOnLoad(modelClass, entities)
+
+                return models
+            }
+
+            return result
+        }
+
+        execute[FLAG] = true
+        query.execute = execute
+    }
+
+    return query
 }

@@ -1,8 +1,9 @@
-import { Awaitable, Class, getSuperClass } from '@midway3-components/data'
+import { Class, getSuperClass } from '@midway3-components/data'
 import { getClassMetadata, listPropertyDataFromClass, saveClassMetadata, savePropertyDataToClass } from '@midwayjs/core'
 import { Transform } from 'class-transformer'
 import { Column as DrizzleColumn, SQL, Table } from 'drizzle-orm'
 import { Drizzle } from '../interface'
+import { OnLoad, OnLoadCallback } from './load'
 
 type From = Table
 type Join = {
@@ -11,21 +12,23 @@ type Join = {
     on: SQL
 }
 
-type Entity = object
-export type EntityClass<T extends Entity = any> = Class<T, []>
-
-type LifecycleCallback<T> = (entity: T) => Awaitable<T | void>
+type BaseEntity = object
+export type EntityClass<T extends BaseEntity = any> = Class<T, []>
 
 export type EntityOptions<T = any> = {
     joins?: Join[]
-    onLoad?: LifecycleCallback<T>
+    onLoad?: OnLoadCallback<T>
     dataSource?: Drizzle | string
 }
 
 const entityKey = Symbol('@midway3-components/drizzle:decorator:entity')
-export function Entity<T extends Entity = any>(from: From, options?: EntityOptions<T>): ClassDecorator {
+export function Entity<T extends BaseEntity = any>(from: From, options?: EntityOptions<T>): ClassDecorator {
     return (target) => {
         saveClassMetadata(entityKey, { from, options }, target)
+        const { onLoad } = options ?? {}
+        if (onLoad != null) {
+            OnLoad(onLoad)(target)
+        }
     }
 }
 
@@ -38,7 +41,7 @@ export function getEntityMeta(clz: Class): EntityMeta | null {
     const result: EntityMeta = getClassMetadata(entityKey, clz)
     if (result == null) {
         const superClz = getSuperClass(clz)
-        if (superClz != null && superClz !== Object) {
+        if (superClz != null) {
             return getEntityMeta(superClz)
         }
     }
@@ -50,23 +53,6 @@ export function isEntityClass(clz: Class) {
     return getEntityMeta(clz) != null
 }
 
-export async function triggerOnLoad<T extends Entity>(clz: EntityClass<T>, items: T[]): Promise<T[]> {
-    const superClz = getSuperClass(clz)
-    if (superClz != null) {
-        await triggerOnLoad(superClz, items)
-    }
-
-    const { options } = getEntityMeta(clz) ?? {}
-    const { onLoad } = options ?? {}
-    if (onLoad != null) {
-        return Promise.all(items.map(
-            x => onLoad(x) ?? x
-        ))
-    }
-
-    return items
-}
-
 type ReadValue<T> = (val: any, key: string | symbol, entity: T) => unknown
 export type ColumnOptions<T = any> = {
     nullValue?: unknown
@@ -76,8 +62,8 @@ export type ColumnOptions<T = any> = {
 const columnKey = Symbol('@midway3-components/drizzle:decorator:column')
 
 type EntityColumn = DrizzleColumn | SQL
-export function Column<T extends Entity = any>(column: EntityColumn, options?: ColumnOptions<T>): PropertyDecorator
-export function Column<T extends Entity = any>(column: EntityColumn, readValue: ReadValue<T>): PropertyDecorator
+export function Column<T extends BaseEntity = any>(column: EntityColumn, options?: ColumnOptions<T>): PropertyDecorator
+export function Column<T extends BaseEntity = any>(column: EntityColumn, readValue: ReadValue<T>): PropertyDecorator
 export function Column(column: EntityColumn, y?: ColumnOptions | ReadValue<any>): PropertyDecorator {
     const options = typeof y === 'function'
         ? { readValue: y }
@@ -111,7 +97,7 @@ export function getColumnsMeta(clz: Class): ColumnMeta[] {
     const result: ColumnMeta[] = listPropertyDataFromClass(columnKey, clz)
 
     const superClz = getSuperClass(clz)
-    if (superClz != null && superClz !== Object) {
+    if (superClz != null) {
         return [
             ...getColumnsMeta(superClz),
             ...result

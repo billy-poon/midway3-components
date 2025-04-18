@@ -1,5 +1,5 @@
 import { ActiveDataProvider } from '@midway3-components/data'
-import { ActiveQuery, InjectDrizzle, MySQL2Drizzle, PostgresDrizzle } from '@midway3-components/drizzle'
+import { ActiveQuery, Drizzle, InjectDrizzle } from '@midway3-components/drizzle'
 import { Controller, Get, Query } from '@midwayjs/core'
 import { like, or } from 'drizzle-orm'
 
@@ -9,10 +9,10 @@ import { like, or } from 'drizzle-orm'
 @Controller('/api/actor')
 export class ActorController {
     @InjectDrizzle('postgres')
-    pg: PostgresDrizzle
+    pg: Drizzle
 
     @InjectDrizzle('mysql')
-    mysql: MySQL2Drizzle
+    mysql: Drizzle
 
     @Get('/')
     async indexAction(

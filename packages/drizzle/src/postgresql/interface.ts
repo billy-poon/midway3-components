@@ -6,7 +6,7 @@ import type { Schema } from '../interface'
 export type NodePgClient = Pool | PoolClient | Client
 
 export type PostgresDataSourceOptions<TSchema extends Schema = Schema> =
-    & { type: 'postgres' }
+    & { type: 'postgresql' }
     & DrizzleConfig<TSchema>
     & ({
         connection: string | PoolConfig

@@ -66,7 +66,7 @@ export function getFieldDefinitions(x: unknown) {
     const result = listPropertyDataFromClass(key, clz) as FieldDefinition[]
 
     const superClz = getSuperClass(clz)
-    if (superClz != null && superClz !== Object) {
+    if (superClz != null) {
         return [...getFieldDefinitions(superClz), ...result]
     }
 

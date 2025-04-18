@@ -2,6 +2,7 @@ import { getCurrentContext } from '@midway3-components/web'
 import { getCurrentMainApp, MidwayConfig } from '@midwayjs/core'
 import { config } from 'dotenv'
 import { Logger } from 'drizzle-orm'
+import { resolve } from 'path'
 
 config({
     path: ['.env', `.env-${process.env.NODE_ENV}`]
@@ -33,19 +34,22 @@ export default {
     },
     drizzle: {
         default: {
-            casing: 'snake_case',
+            casing: 'snake_case'
         },
         dataSource: {
             postgres: {
                 // https://wiki.postgresql.org/wiki/Sample_Databases
-                connection: `postgres://${DB_USER}:${DB_PASS}@localhost/pagila`,
-                logger: drizzleLogger('postgres'),
+                connection: `postgresql://${DB_USER}:${DB_PASS}@localhost/pagila`,
+                logger: drizzleLogger('postgresql'),
             },
             mysql: {
                 // https://dev.mysql.com/doc/sakila/en/sakila-installation.html
-                type: 'mysql',
                 connection: `mysql://${DB_USER}:${DB_PASS}@localhost/sakila`,
                 logger: drizzleLogger('mysql'),
+            },
+            sqlite: {
+                // https://github.com/bradleygrant/sakila-sqlite3
+                connection: `file://${resolve(__dirname, '../../db/sakila.db')}`
             }
         }
     },

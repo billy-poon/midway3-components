@@ -54,7 +54,7 @@ export function Sortable<T = any>(x: unknown): ClassDecorator {
 export function getSortableOptions<T>(clz: Class<T>): SortableOptions<T> {
     const result: SortableOptions<T> = getClassMetadata(key, clz) ?? {}
     const superClz = getSuperClass(clz)
-    if (superClz != null && superClz !== Object) {
+    if (superClz != null) {
         const parent = getSortableOptions(superClz)
         return {
             attributes: [...(parent.attributes ?? []), ...(result.attributes ?? [])] as any,

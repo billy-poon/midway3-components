@@ -43,10 +43,29 @@ export function configure<T>(target: T, values: Partial<T>) {
     return target
 }
 
-export function getSuperClass(clz: Class): Class | null {
+export function getSuperClass(clz: Class, until = Object): Class | null {
     if (clz?.prototype != null) {
-        return Object.getPrototypeOf(clz.prototype)?.constructor ?? null
+        const result = Object.getPrototypeOf(clz.prototype)?.constructor ?? null
+        if (result !== until) {
+            return result
+        }
     }
 
     return null
+}
+
+type AsyncMapFn<T, U> = (v: T, i: number) => Promise<U>
+export async function asyncMap<T, U>(items: T[], cb: AsyncMapFn<T, U>, concurrent = false) {
+    if (concurrent) {
+        return Promise.all(items.map(async (x, i) => cb(x, i)))
+    }
+
+    let index = 0
+    let result: U[] = []
+    for (const x of items) {
+        const item = await cb(x, index++)
+        result.push(item)
+    }
+
+    return result
 }
