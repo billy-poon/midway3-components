@@ -23,17 +23,38 @@
     "registry": "https://registry.npmjs.org"
   },
   "license": "MIT",
+  "dependencies": {
+    "@midway3-components/data": "workspace:^",
+    "@midwayjs/core": "3",
+    "class-transformer": "^0.5.1"
+  },
   "devDependencies": {
     "@libsql/client": "^0.15.2",
     "@types/pg": "^8.11.11",
+    "drizzle-orm": "^0.41.0",
     "mysql2": "^3.14.0",
     "pg": "^8.14.1",
     "typescript": "^5.8.2"
   },
-  "dependencies": {
-    "@midway3-components/data": "workspace:^",
-    "@midwayjs/core": "3",
-    "class-transformer": "^0.5.1",
-    "drizzle-orm": "^0.41.0"
+  "peerDependencies": {
+    "@libsql/client": ">=0.10.0",
+    "drizzle-orm": "^0.41.0",
+    "mysql2": ">=2",
+    "@types/pg": "*",
+    "pg": ">=8"
+  },
+  "peerDependenciesMeta": {
+    "@libsql/client": {
+      "optional": true
+    },
+    "mysql2": {
+      "optional": true
+    },
+    "@types/pg": {
+      "optional": true
+    },
+    "pg": {
+      "optional": true
+    }
   }
 }

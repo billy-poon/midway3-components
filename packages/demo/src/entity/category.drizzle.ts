@@ -1,5 +1,5 @@
 import { ActiveRecord, isSQLite, Table } from '@midway3-components/drizzle'
-import { categoryTable } from '../schema/sqlite'
+import { categoryTable } from '../schema/pg'
 
 function CreateActiveRecord<T extends Table>(table: T) {
     const name = table.constructor.name

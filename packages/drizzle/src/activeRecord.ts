@@ -1,9 +1,9 @@
 import { Class } from '@midway3-components/data'
-import { and, eq, SQL, Table } from 'drizzle-orm'
+import { and, Column, eq, SQL } from 'drizzle-orm'
 import { ActiveQuery } from './activeQuery'
 import { getDataSource } from './dataSourceManager'
 import { OnLoad } from './decorator/load'
-import { ColumnKeyOf, ColumnsOf, Drizzle, PrimaryKeyOf, RowOf } from './interface'
+import { ColumnKeyOf, ColumnsOf, Drizzle, PrimaryKeyOf, RowOf, Table } from './interface'
 import { isDrizzleColumn, isMySQL, isMySQLResult, isPostgres, isPostgresResult, isSQLite, isSQLiteResult } from './utils'
 
 function getColumns<T extends Table>(table: T) {
@@ -56,7 +56,8 @@ class AbstractActiveRecord<T extends Table> {
     }
 
     pk(validate = true): PrimaryKeyOf<T> {
-        const columns = (this.constructor as typeof AbstractActiveRecord).columns()
+        const columns: Record<string, Column>
+            = (this.constructor as typeof AbstractActiveRecord).columns()
         const result = Object.entries(columns)
             .reduce(
                 (res, [k, v]) => {
