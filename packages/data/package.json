@@ -24,11 +24,12 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@midwayjs/core": "3",
     "sequelize": "^6.37.7",
     "typeorm": "^0.3.22",
     "typescript": "^5.8.2"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@midwayjs/core": "3"
   }
 }

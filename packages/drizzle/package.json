@@ -24,11 +24,11 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@midway3-components/data": "workspace:^",
-    "@midwayjs/core": "3",
     "class-transformer": "^0.5.1"
   },
   "devDependencies": {
+    "@midway3-components/data": "workspace:^",
+    "@midwayjs/core": "3",
     "@libsql/client": "^0.15.2",
     "@types/pg": "^8.11.11",
     "drizzle-orm": "^0.41.0",
@@ -37,6 +37,8 @@
     "typescript": "^5.8.2"
   },
   "peerDependencies": {
+    "@midway3-components/data": "*",
+    "@midwayjs/core": "3",
     "@libsql/client": ">=0.10.0",
     "drizzle-orm": "^0.41.0",
     "mysql2": ">=2",
