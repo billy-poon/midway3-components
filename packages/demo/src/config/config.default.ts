@@ -89,4 +89,9 @@ export default {
             }
         }
     },
+    midwayLogger: {
+        default: {
+            level: 'info',
+        }
+    }
 } as MidwayConfig

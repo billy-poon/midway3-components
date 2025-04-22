@@ -3,8 +3,13 @@
     "private": true,
     "scripts": {
         "dev": "pnpm demo dev",
+        "dev:cli": "pnpm demo dev:cli",
         "demo": "pnpm -F @midway3-components/demo",
         "demo:build": "pnpm demo build",
+
+        "cli": "pnpm -F @midway3-components/cli",
+        "cli:build": "pnpm cli build",
+        "cli:publish": "pnpm cli build && pnpm cli publish --access public",
 
         "data": "pnpm -F @midway3-components/data",
         "data:build": "pnpm data build",
