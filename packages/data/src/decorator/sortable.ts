@@ -3,8 +3,6 @@ import { ORDER, SortableAttributes } from '../data'
 import { Class } from '../interface'
 import { getSuperClass } from '../utils'
 
-const key = Symbol('decorator-key:sortable')
-
 export interface SortableOptions<T> {
     /**
      * Define sortable attributes, e.g.
@@ -38,6 +36,8 @@ export interface SortableOptions<T> {
      */
     defaultOrder?: Record<string, ORDER>
 }
+
+const key = Symbol('@midway3-components/data:decorator:sortable')
 
 export function Sortable<T = any>(options: SortableOptions<T>): ClassDecorator
 export function Sortable<T = any>(attributes: SortableAttributes<T>): ClassDecorator
