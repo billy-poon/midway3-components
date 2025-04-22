@@ -33,7 +33,7 @@ function wrapLogger(proto: ILogger) {
 const CTX = Symbol('@midway3-components/cli:framework.context')
 const CMD = Symbol('@midway3-components/cli:framework.command')
 type ParsedArgv = {
-    [CTX]: Context
+    [CTX]?: Context
     [CMD]?: string
 }
 
@@ -75,7 +75,7 @@ export class ComponentFramework extends BaseFramework<
                 })
         }
 
-        // yargs builtin `help|version` command hit
+        // yargs builtin `help|--version` command hit
         app.exit = (code, err) => {
             if (!this.#interactive) {
                 this.destroy(code, err)
@@ -177,6 +177,9 @@ export class ComponentFramework extends BaseFramework<
             },
             async (argv) => {
                 const { [CTX]: ctx } = argv
+                if (ctx == null) {
+                    throw new Error('Context is not attached.')
+                }
                 ctx.command = result
                 ctx.argv = argv
 
@@ -218,7 +221,7 @@ export class ComponentFramework extends BaseFramework<
             const argv = await this.app.parseAsync()
             parsedCb?.()
 
-            const { command, exitCode } = argv[CTX]
+            const { command, exitCode } = argv[CTX] ?? {}
             if (command == null) {
                 const requestCommand = argv[CMD]
                 if (requestCommand == null) {
