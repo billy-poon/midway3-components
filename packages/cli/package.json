@@ -1,12 +1,13 @@
 {
   "name": "@midway3-components/cli",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "",
   "main": "dist/index.js",
   "typings": "index.d.ts",
   "files": [
     "dist/**/*.js",
     "dist/**/*.d.ts",
+    "samples/**/*",
     "index.d.ts"
   ],
   "scripts": {
