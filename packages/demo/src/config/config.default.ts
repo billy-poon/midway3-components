@@ -49,7 +49,7 @@ export default {
             },
             sqlite: {
                 // https://github.com/bradleygrant/sakila-sqlite3
-                connection: `sqlite://${resolve(__dirname, '../../db/sakila.db')}`
+                connection: `file://${resolve(__dirname, '../../db/sakila.db')}`
             }
         }
     },

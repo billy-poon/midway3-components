@@ -7,12 +7,15 @@ import type { SQLiteDataSourceOptions, SQLiteDrizzle } from './sqlite/interface'
 
 export { DialectType }
 
+type SQLiteProtocolType = 'wss' | 'ws' | 'https' | 'http' | 'file'
+type ProtocolType = Exclude<DialectType, 'sqlite'> | SQLiteProtocolType
+
 export type Schema = Record<string, unknown>
 export type DrizzleDataSourceOptions =
     | SQLiteDataSourceOptions
     | MySQL2DataSourceOptions
     | PostgresDataSourceOptions
-    | (DrizzleConfig<Schema> & { connection?: `${DialectType}://${string}` })
+    | (DrizzleConfig<Schema> & { connection?: `${ProtocolType}://${string}` })
 
 export interface ConfigurationOptions {
     drizzle: DataSourceManagerConfigOption<DrizzleDataSourceOptions, never>
