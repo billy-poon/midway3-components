@@ -46,7 +46,7 @@ export class DrizzleDataSourceManager extends DataSourceManager<Drizzle> {
             const { create } = await import('./sqlite')
             factory = create as any
         } else {
-            throw new Error('Unsupported data source type: ' + theType)
+            throw new Error(`Unsupported dataSource [${dataSourceName}] type: ${theType}`)
         }
 
         const result = await factory(config)
@@ -90,7 +90,7 @@ function parseType(connection: string): DialectType {
         return 'sqlite'
     }
 
-    return (dialect ?? 'unknown') as DialectType
+    return (dialect ?? '<empty>') as DialectType
 }
 
 export function getDataSource(dataSourceName?: string) {
@@ -100,7 +100,7 @@ export function getDataSource(dataSourceName?: string) {
     const name = dataSourceName ?? service.getDefaultDataSourceName()
     const result = service.getDataSource(name)
     if (result == null) {
-        throw new Error('Failed to get data source: ' + name)
+        throw new Error('Failed to get dataSource: ' + name)
     }
 
     return result

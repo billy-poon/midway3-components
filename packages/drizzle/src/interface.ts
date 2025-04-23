@@ -1,17 +1,18 @@
 import type { DataSourceManagerConfigOption } from '@midwayjs/core'
 import type { Column, DrizzleConfig, Placeholder, SQL, TableConfig, Table as _Table } from 'drizzle-orm'
+import type { DialectType } from './constants'
 import type { MySQL2DataSourceOptions, MySQL2Drizzle } from './mysql/interface'
 import type { PostgresDataSourceOptions, PostgresDrizzle } from './postgresql/interface'
 import type { SQLiteDataSourceOptions, SQLiteDrizzle } from './sqlite/interface'
 
-export type { DialectType } from './constants'
+export { DialectType }
 
 export type Schema = Record<string, unknown>
 export type DrizzleDataSourceOptions =
     | SQLiteDataSourceOptions
     | MySQL2DataSourceOptions
     | PostgresDataSourceOptions
-    | DrizzleConfig<Schema>
+    | (DrizzleConfig<Schema> & { connection?: `${DialectType}://${string}` })
 
 export interface ConfigurationOptions {
     drizzle: DataSourceManagerConfigOption<DrizzleDataSourceOptions, never>
