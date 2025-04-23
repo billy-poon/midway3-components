@@ -40,7 +40,7 @@
     "node": ">=12.0.0"
   },
   "scripts": {
-    "cli": "NODE_ENV=production node ./bootstrap-cli.js",
+    "cli": "NODE_ENV=local node ./bootstrap-cli.js",
     "dev:cli": "cross-env NODE_ENV=local mwtsc --watch --run ./bootstrap-cli.js",
 
     "start": "NODE_ENV=production node ./bootstrap.js",

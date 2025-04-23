@@ -13,6 +13,14 @@ function CreateActiveRecord<T extends Table>(table: T) {
 }
 
 export class Category extends CreateActiveRecord(categoryTable) {
+    static table() {
+        return categoryTable
+    }
+
+    static columns() {
+        return super.columns()
+    }
+
     protected async beforeInsert(): Promise<boolean> {
         if (await super.beforeInsert()) {
             if (isSQLite(Category.db())) {

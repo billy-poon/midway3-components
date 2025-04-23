@@ -1,4 +1,3 @@
-import { Class } from '@midway3-components/core'
 import { and, Column, eq, SQL } from 'drizzle-orm'
 import { ActiveQuery } from './activeQuery'
 import { getDataSource } from './dataSourceManager'
@@ -20,10 +19,14 @@ function getColumns<T extends Table>(table: T) {
         )
 }
 
-type TableOf<T> = T extends Class<AbstractActiveRecord<infer P>>
+type TableOf<T> = T extends ActiveRecordConstructor<infer P>
     ? P : never
 
-type BuildActiveQuery<T extends object, K extends Table> = (query: ActiveQuery<T>, table: K, op: Operations) => void
+type BuildActiveQuery<T extends ActiveRecordConstructor<any>> = (
+    query: ActiveQuery<InstanceType<T>>,
+    table: TableOf<T>,
+    op: Operations
+) => void
 
 export interface ActiveRecordConstructor<T extends Table> {
     new (...args: any): AbstractActiveRecord<T> & RowOf<T>
@@ -32,32 +35,42 @@ export interface ActiveRecordConstructor<T extends Table> {
     table(): T
     columns(): ColumnsOf<T>
 
-    find<T extends ActiveRecordConstructor<any>>(this: T, build?: BuildActiveQuery<InstanceType<T>, TableOf<T>>): ActiveQuery<InstanceType<T>>
-    findOne<T extends ActiveRecordConstructor<any>>(this: T, where?: SQL | BuildActiveQuery<InstanceType<T>, TableOf<T>>): Promise<InstanceType<T>>
+    find<T extends ActiveRecordConstructor<any>>(this: T, build?: BuildActiveQuery<T>): ActiveQuery<InstanceType<T>>
+    findOne<T extends ActiveRecordConstructor<any>>(this: T, where?: SQL | BuildActiveQuery<T>): Promise<InstanceType<T>>
+}
+
+export interface AbstractActiveRecord<T extends Table> {
+    readonly $row?: RowOf<T>
+    constructor: ActiveRecordConstructor<T>
 }
 
 @OnLoad<AbstractActiveRecord<any>>(async (x, v) => {
     await x.afterFind(v)
 })
 export class AbstractActiveRecord<T extends Table> {
-    declare readonly $row?: RowOf<T>
-
     static db() {
         return getDataSource()
     }
 
-    static table<T extends typeof AbstractActiveRecord>(this: T): TableOf<T> {
+    static table<T extends Table>(
+        this: ActiveRecordConstructor<T>
+    ): TableOf<typeof this> {
         throw new Error('Table is not provided.')
     }
 
-    static columns<T extends typeof AbstractActiveRecord>(this: T) {
+    static columns<T extends Table>(
+        this: ActiveRecordConstructor<T>
+    ) {
         return getColumns(this.table())
     }
 
-    static find<T extends typeof AbstractActiveRecord>(this: T, build?: BuildActiveQuery<InstanceType<T>, TableOf<T>>) {
+    static find<T extends Table>(
+        this: ActiveRecordConstructor<T>,
+        build?: BuildActiveQuery<typeof this>
+    ) {
         const table = this.table()
         const query = this.db().select().from(table)
-        const result = new ActiveQuery<InstanceType<T>>(query as any, this as any)
+        const result = new ActiveQuery<InstanceType<ActiveRecordConstructor<T>>>(query as any, this as any)
         if (build != null) {
             build(result, table, op)
         }
@@ -65,8 +78,11 @@ export class AbstractActiveRecord<T extends Table> {
         return result
     }
 
-    static findOne<T extends typeof AbstractActiveRecord>(this: T, where?: SQL | BuildActiveQuery<InstanceType<T>, TableOf<T>>) {
-        const build: BuildActiveQuery<InstanceType<T>, TableOf<T>> = typeof where === 'function'
+    static findOne<T extends Table>(
+        this: ActiveRecordConstructor<T>,
+        where?: SQL | BuildActiveQuery<typeof this>
+    ) {
+        const build: BuildActiveQuery<ActiveRecordConstructor<T>> = typeof where === 'function'
             ? where
             : (q) => where != null && q.where(where)
 
@@ -74,8 +90,8 @@ export class AbstractActiveRecord<T extends Table> {
     }
 
     pk(validate = true): PrimaryKeyOf<T> {
-        const columns: Record<string, Column>
-            = (this.constructor as typeof AbstractActiveRecord).columns()
+        const columns: Record<string, Column> = this.constructor.columns()
+
         const result = Object.entries(columns)
             .reduce(
                 (res, [k, v]) => {
@@ -105,9 +121,7 @@ export class AbstractActiveRecord<T extends Table> {
 
     protected createWhereFromPk() {
         const pk = this.pk()
-
-        const ctor = this.constructor as typeof AbstractActiveRecord
-        const table = ctor.table()
+        const table = this.constructor.table()
 
         const result = and(
             ...Object.entries(pk)
@@ -137,7 +151,7 @@ export class AbstractActiveRecord<T extends Table> {
     }
 
     attributes() {
-        const columns = (this.constructor as typeof AbstractActiveRecord).columns()
+        const columns = this.constructor.columns()
         return Object.entries(columns)
             .reduce(
                 (res, [k]) => (res[k] = this[k], res),
@@ -187,24 +201,26 @@ export class AbstractActiveRecord<T extends Table> {
 
     protected async insert() {
         const values = this.attributes()
-        const ctor = this.constructor as typeof AbstractActiveRecord
+        const ctor = this.constructor
+
+        const db = ctor.db() as object
+        const table = ctor.table() as Table
 
         let result: any
-        const db = ctor.db() as object
         if (isPostgres(db)) {
-            const [row] = await db.insert(ctor.table())
+            const [row] = await db.insert(table)
                 .values(values)
                 .returning()
                 .execute()
             result = row
         } else if (isSQLite(db)) {
-            const [row] = await db.insert(ctor.table())
+            const [row] = await db.insert(table)
                 .values(values)
                 .returning()
                 .execute()
             result = row
         } else if (isMySQL(db)) {
-            const [row] =  await db.insert(ctor.table() as any)
+            const [row] =  await db.insert(table as any)
                 .values(values)
                 .$returningId()
                 .execute()
@@ -227,10 +243,10 @@ export class AbstractActiveRecord<T extends Table> {
 
     protected async update() {
         const where = this.createWhereFromPk()
-        const ctor = this.constructor as typeof AbstractActiveRecord
+        const ctor = this.constructor
 
         const values = this.dirtyAttributes()
-        let result = Object.keys(values).length > 0
+        const result = Object.keys(values).length > 0
             ? await ctor.db()
                 .update(ctor.table())
                 .set(values)
@@ -250,8 +266,7 @@ export class AbstractActiveRecord<T extends Table> {
 
     async refresh() {
         const where = this.createWhereFromPk()
-        const ctor = this.constructor as typeof AbstractActiveRecord
-        const model = await ctor.findOne(where)
+        const model = await this.constructor.findOne(where)
         await this.afterFind(model.$row as any)
 
         return this
@@ -260,8 +275,9 @@ export class AbstractActiveRecord<T extends Table> {
     async delete() {
         if (await this.beforeDelete()) {
             const where = this.createWhereFromPk()
-            const ctor = this.constructor as typeof AbstractActiveRecord
-            let result = await ctor.db()
+            const ctor = this.constructor
+
+            const result = await ctor.db()
                 .delete(ctor.table())
                 .where(where)
                 .execute()
@@ -306,7 +322,7 @@ export function ActiveRecord<T extends Table>(table: T, dataSource?: Drizzle | s
             return getDataSource(dataSource)
         }
 
-        static table<T extends typeof AbstractActiveRecord>(this: T): TableOf<T> {
+        static table<T extends ActiveRecordConstructor<any>>(this: T): TableOf<T> {
             return table as any
         }
     }
