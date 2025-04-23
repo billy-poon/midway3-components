@@ -23,7 +23,10 @@
         "drizzle:build": "pnpm drizzle build",
         "drizzle:publish": "pnpm drizzle build && pnpm drizzle publish --access public",
 
-        "build": "pnpm core:build && pnpm web:build && pnpm drizzle:build && pnpm cli:build && pnpm demo:build",
+
+        "build:all": "pnpm core:build && pnpm web:build && pnpm drizzle:build && pnpm cli:build && pnpm demo:build",
+        "publish:all": "pnpm core:publish && pnpm web:publish && pnpm drizzle:publish && pnpm cli:publish",
+
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "devDependencies": {
