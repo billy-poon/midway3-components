@@ -1,4 +1,4 @@
-import { Class } from '@midway3-components/data'
+import { Class } from '@midway3-components/core'
 import { and, Column, eq, SQL } from 'drizzle-orm'
 import { ActiveQuery } from './activeQuery'
 import { getDataSource } from './dataSourceManager'

@@ -1,4 +1,4 @@
-import { Pagination as _Pagination } from '@midway3-components/data/dist/data'
+import { Pagination as _Pagination } from '@midway3-components/core/dist/data'
 import { ParsedUrlQuery } from 'querystring'
 import { Link } from '../link'
 import { UrlFactory } from '../service/urlService'

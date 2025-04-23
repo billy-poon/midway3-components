@@ -1,4 +1,4 @@
-import { Class } from '@midway3-components/data'
+import { Class } from '@midway3-components/core'
 import { listPropertyDataFromClass, savePropertyDataToClass } from '@midwayjs/core'
 import { CommandDefinition, CommandOptions } from './command'
 import { listNamedOptions, listPositionalOptions } from './option'

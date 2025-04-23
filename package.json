@@ -11,9 +11,9 @@
         "cli:build": "pnpm cli build",
         "cli:publish": "pnpm cli build && pnpm cli publish --access public",
 
-        "data": "pnpm -F @midway3-components/data",
-        "data:build": "pnpm data build",
-        "data:publish": "pnpm data build && pnpm data publish --access public",
+        "core": "pnpm -F @midway3-components/core",
+        "core:build": "pnpm core build",
+        "core:publish": "pnpm core build && pnpm core publish --access public",
 
         "web": "pnpm -F @midway3-components/web",
         "web:build": "pnpm web build",
@@ -23,7 +23,7 @@
         "drizzle:build": "pnpm drizzle build",
         "drizzle:publish": "pnpm drizzle build && pnpm drizzle publish --access public",
 
-        "build": "pnpm data:build && pnpm web:build && pnpm drizzle:build && pnpm demo:build",
+        "build": "pnpm core:build && pnpm web:build && pnpm drizzle:build && pnpm cli:build && pnpm demo:build",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "devDependencies": {

@@ -1,4 +1,4 @@
-import { BaseDataProvider } from '@midway3-components/data/dist/data'
+import { BaseDataProvider } from '@midway3-components/core/dist/data'
 import { SerializerService as _SerializerService } from '@midway3-components/web'
 import { getProviderUUId, IMidwayContainer, Provide, providerWrapper } from '@midwayjs/core'
 

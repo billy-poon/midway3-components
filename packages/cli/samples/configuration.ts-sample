@@ -2,7 +2,7 @@
 import { Configuration, ILifeCycle, ILogger, Logger } from '@midwayjs/core'
 
 import * as cli from '@midway3-components/cli'
-import * as data from '@midway3-components/data'
+import * as data from '@midway3-components/core'
 import * as drizzle from '@midway3-components/drizzle'
 import { join } from 'path'
 

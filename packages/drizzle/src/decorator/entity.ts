@@ -1,4 +1,4 @@
-import { Class, getSuperClass } from '@midway3-components/data'
+import { Class, getSuperClass } from '@midway3-components/core'
 import { getClassMetadata, listPropertyDataFromClass, saveClassMetadata, savePropertyDataToClass } from '@midwayjs/core'
 import { Transform } from 'class-transformer'
 import { Column as DrizzleColumn, SQL, Table } from 'drizzle-orm'

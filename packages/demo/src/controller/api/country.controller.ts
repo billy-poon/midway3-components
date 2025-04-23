@@ -1,5 +1,5 @@
-import { ActiveDataProvider } from '@midway3-components/data'
-import { ActiveQuery } from '@midway3-components/data/dist/sequelize'
+import { ActiveDataProvider } from '@midway3-components/core'
+import { ActiveQuery } from '@midway3-components/core/dist/sequelize'
 import { Controller, Get, Param, Query } from '@midwayjs/core'
 import { Op } from 'sequelize'
 import { Country } from '../../entity/country.sequelize'

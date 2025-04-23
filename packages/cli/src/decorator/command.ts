@@ -1,4 +1,4 @@
-import { Class } from '@midway3-components/data'
+import { Class } from '@midway3-components/core'
 import { getClassMetadata, listModule, Provide, saveClassMetadata, saveModule } from '@midwayjs/core'
 import { Middleware } from '../interface'
 import { listNamedOptions, listPositionalOptions } from './option'

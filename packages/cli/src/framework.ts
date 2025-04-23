@@ -1,4 +1,4 @@
-import { Class } from '@midway3-components/data'
+import { Class } from '@midway3-components/core'
 import { BaseFramework, Framework, getCurrentMainFramework, ILogger, IMidwayBootstrapOptions, MidwayLifeCycleService } from '@midwayjs/core'
 import { createInterface } from 'node:readline'
 import { hideBin } from 'yargs/helpers'

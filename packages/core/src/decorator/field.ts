@@ -34,7 +34,7 @@ export interface FieldDefinition extends FieldOptions {
     propertyKey: string | symbol,
 }
 
-const key = Symbol('@midway3-components/data:decorator:field')
+const key = Symbol('@midway3-components/core:decorator:field')
 export function Field(name: string): PropertyDecorator
 export function Field(extra: true): PropertyDecorator
 export function Field(options?: FieldOptions): PropertyDecorator

@@ -1,4 +1,4 @@
-import { Field } from '@midway3-components/data'
+import { Field } from '@midway3-components/core'
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity()

@@ -1,4 +1,4 @@
-import { ActiveDataProvider } from '@midway3-components/data'
+import { ActiveDataProvider } from '@midway3-components/core'
 import { ActiveQuery, Drizzle, InjectDrizzle } from '@midway3-components/drizzle'
 import { Controller, Get, Query } from '@midwayjs/core'
 import { like, or } from 'drizzle-orm'

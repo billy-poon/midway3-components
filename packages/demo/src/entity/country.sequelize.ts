@@ -1,4 +1,4 @@
-import { Field, Sortable } from '@midway3-components/data'
+import { Field, Sortable } from '@midway3-components/core'
 import { Column, Model, PrimaryKey, Table } from 'sequelize-typescript'
 
 @Table({

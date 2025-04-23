@@ -37,7 +37,7 @@ export interface SortableOptions<T> {
     defaultOrder?: Record<string, ORDER>
 }
 
-const key = Symbol('@midway3-components/data:decorator:sortable')
+const key = Symbol('@midway3-components/core:decorator:sortable')
 
 export function Sortable<T = any>(options: SortableOptions<T>): ClassDecorator
 export function Sortable<T = any>(attributes: SortableAttributes<T>): ClassDecorator

@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@libsql/client": "^0.15.2",
-    "@midway3-components/data": "workspace:^",
+    "@midway3-components/core": "workspace:^",
     "@midwayjs/core": "3",
     "@types/pg": "^8.11.11",
     "drizzle-orm": "^0.42.0",
@@ -38,7 +38,7 @@
   },
   "peerDependencies": {
     "@libsql/client": ">=0.10.0",
-    "@midway3-components/data": "*",
+    "@midway3-components/core": "*",
     "@midwayjs/core": "3",
     "@types/pg": "*",
     "drizzle-orm": ">=0.42.0",

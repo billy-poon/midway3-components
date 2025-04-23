@@ -1,5 +1,5 @@
-import { Class, getSortableOptions, QueryInterface, SortableOptions } from '@midway3-components/data'
-import { ORDER } from '@midway3-components/data/dist/data'
+import { Class, getSortableOptions, QueryInterface, SortableOptions } from '@midway3-components/core'
+import { ORDER } from '@midway3-components/core/dist/data'
 import { isClass } from '@midwayjs/core/dist/util/types'
 import { plainToInstance } from 'class-transformer'
 import { asc, desc, Placeholder, SQL, sql, SQLWrapper } from 'drizzle-orm'

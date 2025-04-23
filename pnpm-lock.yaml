@@ -24,9 +24,9 @@ importers:
         specifier: ^17.7.2
         version: 17.7.2
     devDependencies:
-      '@midway3-components/data':
+      '@midway3-components/core':
         specifier: workspace:^
-        version: link:../data
+        version: link:../core
       '@midwayjs/core':
         specifier: '3'
         version: 3.20.3
@@ -36,6 +36,21 @@ importers:
       '@types/node':
         specifier: ^22.13.14
         version: 22.13.14
+      typescript:
+        specifier: ^5.8.2
+        version: 5.8.2
+
+  packages/core:
+    devDependencies:
+      '@midwayjs/core':
+        specifier: '3'
+        version: 3.20.3
+      sequelize:
+        specifier: ^6.37.7
+        version: 6.37.7(mysql2@3.14.0)(pg@8.14.1)(sqlite3@5.1.7)
+      typeorm:
+        specifier: ^0.3.22
+        version: 0.3.22(mysql2@3.14.0)(pg@8.14.1)(reflect-metadata@0.2.2)(sqlite3@5.1.7)
       typescript:
         specifier: ^5.8.2
         version: 5.8.2
@@ -60,9 +75,9 @@ importers:
       '@midway3-components/cli':
         specifier: workspace:^
         version: link:../cli
-      '@midway3-components/data':
+      '@midway3-components/core':
         specifier: workspace:^
-        version: link:../data
+        version: link:../core
       '@midway3-components/drizzle':
         specifier: workspace:^
         version: link:../drizzle
@@ -155,9 +170,9 @@ importers:
       '@libsql/client':
         specifier: ^0.15.2
         version: 0.15.2
-      '@midway3-components/data':
+      '@midway3-components/core':
         specifier: workspace:^
-        version: link:../data
+        version: link:../core
       '@midwayjs/core':
         specifier: '3'
         version: 3.20.3
@@ -183,9 +198,9 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0
     devDependencies:
-      '@midway3-components/data':
+      '@midway3-components/core':
         specifier: workspace:^
-        version: link:../data
+        version: link:../core
       '@midwayjs/core':
         specifier: '3'
         version: 3.20.3
@@ -4550,10 +4565,10 @@ snapshots:
     dependencies:
       '@types/yargs-parser': 21.0.3
 
-  '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@7.32.0)(typescript@4.8.4))(eslint@7.32.0)(typescript@4.8.4)':
+  '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@7.32.0)(typescript@5.8.2))(eslint@7.32.0)(typescript@4.8.4)':
     dependencies:
       '@eslint-community/regexpp': 4.12.1
-      '@typescript-eslint/parser': 5.62.0(eslint@7.32.0)(typescript@4.8.4)
+      '@typescript-eslint/parser': 5.62.0(eslint@7.32.0)(typescript@5.8.2)
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/type-utils': 5.62.0(eslint@7.32.0)(typescript@4.8.4)
       '@typescript-eslint/utils': 5.62.0(eslint@7.32.0)(typescript@4.8.4)
@@ -6648,7 +6663,7 @@ snapshots:
 
   mwts@1.3.0(typescript@4.8.4):
     dependencies:
-      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@7.32.0)(typescript@4.8.4))(eslint@7.32.0)(typescript@4.8.4)
+      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@7.32.0)(typescript@5.8.2))(eslint@7.32.0)(typescript@4.8.4)
       '@typescript-eslint/parser': 5.62.0(eslint@7.32.0)(typescript@4.8.4)
       chalk: 4.1.2
       eslint: 7.32.0

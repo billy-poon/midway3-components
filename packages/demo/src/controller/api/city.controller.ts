@@ -1,5 +1,5 @@
-import { ActiveDataProvider } from '@midway3-components/data'
-import { ActiveQuery } from '@midway3-components/data/dist/typeorm'
+import { ActiveDataProvider } from '@midway3-components/core'
+import { ActiveQuery } from '@midway3-components/core/dist/typeorm'
 import { Controller, Get } from '@midwayjs/core'
 import { InjectEntityModel } from '@midwayjs/typeorm'
 import { Repository } from 'typeorm'

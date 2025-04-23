@@ -1,4 +1,4 @@
-import { ActiveDataProvider, SerializerService } from '@midway3-components/data'
+import { ActiveDataProvider, SerializerService } from '@midway3-components/core'
 import { Controller, Get, Inject, Post } from '@midwayjs/core'
 import { like } from 'drizzle-orm'
 import { Category } from '../../entity/category.drizzle'

@@ -5,7 +5,7 @@
   "private": true,
   "dependencies": {
     "@midway3-components/cli": "workspace:^",
-    "@midway3-components/data": "workspace:^",
+    "@midway3-components/core": "workspace:^",
     "@midway3-components/drizzle": "workspace:^",
     "@midway3-components/web": "workspace:^",
     "@midwayjs/bootstrap": "^3.12.0",

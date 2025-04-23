@@ -1,4 +1,4 @@
-import { asyncMap, Awaitable, Class, getSuperClass } from '@midway3-components/data'
+import { asyncMap, Awaitable, Class, getSuperClass } from '@midway3-components/core'
 import { getClassMetadata, saveClassMetadata } from '@midwayjs/core'
 
 export type OnLoadCallback<T> = (entity: T, data: object) => Awaitable<void>

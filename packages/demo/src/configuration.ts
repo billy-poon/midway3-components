@@ -1,4 +1,4 @@
-import * as data from '@midway3-components/data'
+import * as data from '@midway3-components/core'
 import * as drizzle from '@midway3-components/drizzle'
 import * as web from '@midway3-components/web'
 import { App, Configuration, ILifeCycle } from '@midwayjs/core'

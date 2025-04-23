@@ -1,4 +1,4 @@
-import { Class } from '@midway3-components/data'
+import { Class } from '@midway3-components/core'
 import { getMethodParamTypes, getPropertyType } from '@midwayjs/core'
 import { dasherize, underscore } from 'inflected'
 import { PositionalOptionsType } from 'yargs'

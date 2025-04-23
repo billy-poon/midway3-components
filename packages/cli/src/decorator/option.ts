@@ -1,4 +1,4 @@
-import { Class } from '@midway3-components/data'
+import { Class } from '@midway3-components/core'
 import { listPropertyDataFromClass, savePropertyDataToClass } from '@midwayjs/core'
 import { Options, PositionalOptions as _PositionalOptions } from 'yargs'
 import { identity, inferOptionType } from '../utils'
