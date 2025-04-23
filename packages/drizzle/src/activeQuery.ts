@@ -126,7 +126,7 @@ export class ActiveQuery<T extends object> implements QueryInterface<T> {
         return this.query.execute()
     }
 
-    async one(): Promise<T> {
+    async one(): Promise<T | null> {
         const [row] = await this.limit(1).all()
         return row ?? null
     }

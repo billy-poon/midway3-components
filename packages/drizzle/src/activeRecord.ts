@@ -1,3 +1,4 @@
+import { configure } from '@midway3-components/core'
 import { and, Column, eq, SQL } from 'drizzle-orm'
 import { ActiveQuery } from './activeQuery'
 import { getDataSource } from './dataSourceManager'
@@ -36,7 +37,7 @@ export interface ActiveRecordConstructor<T extends Table> {
     columns(): ColumnsOf<T>
 
     find<T extends ActiveRecordConstructor<any>>(this: T, build?: BuildActiveQuery<T>): ActiveQuery<InstanceType<T>>
-    findOne<T extends ActiveRecordConstructor<any>>(this: T, where?: SQL | BuildActiveQuery<T>): Promise<InstanceType<T>>
+    findOne<T extends ActiveRecordConstructor<any>>(this: T, where?: SQL | BuildActiveQuery<T>): Promise<InstanceType<T> | null>
 }
 
 export interface AbstractActiveRecord<T extends Table> {
@@ -78,15 +79,30 @@ export class AbstractActiveRecord<T extends Table> {
         return result
     }
 
-    static findOne<T extends Table>(
+    static async findOne<T extends Table>(
         this: ActiveRecordConstructor<T>,
         where?: SQL | BuildActiveQuery<typeof this>
+    ): Promise<InstanceType<typeof this> | null>
+    static async findOne<T extends Table>(
+        this: ActiveRecordConstructor<T>,
+        where: SQL | BuildActiveQuery<typeof this> | undefined | null,
+        required: true
+    ): Promise<InstanceType<typeof this>>
+    static async findOne<T extends Table>(
+        this: ActiveRecordConstructor<T>,
+        where?: SQL | BuildActiveQuery<typeof this>,
+        required?: boolean
     ) {
-        const build: BuildActiveQuery<ActiveRecordConstructor<T>> = typeof where === 'function'
+        const build: BuildActiveQuery<typeof this> = typeof where === 'function'
             ? where
             : (q) => where != null && q.where(where)
 
-        return this.find(build).one()
+        const result = await this.find(build).one()
+        if (result == null && required) {
+            throw new Error('Object not found.')
+        }
+
+        return result
     }
 
     pk(validate = true): PrimaryKeyOf<T> {
@@ -96,7 +112,7 @@ export class AbstractActiveRecord<T extends Table> {
             .reduce(
                 (res, [k, v]) => {
                     if (v.primary) {
-                        res[k] = this[k]
+                        res[k] = this.$row?.[k]
                     }
                     return res
                 },
@@ -139,15 +155,27 @@ export class AbstractActiveRecord<T extends Table> {
     }
 
     protected async afterFind(row: RowOf<T>) {
-        const $row = { ...row }
+        return this.configureRow(row)
+    }
+
+    configureRow(row: RowOf<T>): this
+    configureRow(row: Partial<RowOf<T>>, merge: true): this
+    configureRow(row: Partial<RowOf<T>>, merge?: boolean) {
+        const $row = merge
+            ? { ...this.$row, ...row }
+            : { ...row }
+
         Object.defineProperty(this, '$row', {
             get: () => $row,
             enumerable: false,
+            configurable: true,
         })
 
-        Object.assign(this, $row)
+        return this.configure($row)
+    }
 
-        return this
+    configure(data: Partial<RowOf<T>>) {
+        return configure(this, data as Partial<this>)
     }
 
     attributes() {
@@ -229,7 +257,7 @@ export class AbstractActiveRecord<T extends Table> {
             throw new Error('Unsupported database.')
         }
 
-        await this.afterFind(result)
+        this.configureRow(result)
         await this.afterSave(true, values)
 
         return 1
@@ -254,6 +282,7 @@ export class AbstractActiveRecord<T extends Table> {
                 .execute()
             : false
 
+        this.configureRow(values, true)
         await this.afterSave(false, values)
         return this.normalizeResult(result)
     }
@@ -267,7 +296,10 @@ export class AbstractActiveRecord<T extends Table> {
     async refresh() {
         const where = this.createWhereFromPk()
         const model = await this.constructor.findOne(where)
-        await this.afterFind(model.$row as any)
+        if (model == null) {
+            throw new Error('Object not found.')
+        }
+        this.configureRow(model.$row!)
 
         return this
     }

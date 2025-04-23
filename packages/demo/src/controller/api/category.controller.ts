@@ -28,7 +28,10 @@ export class CategoryController {
             return: await this.serializer.serialize(ret),
         }
 
-        model.name = 'Home Made'
+        model.configure({
+            name: 'Home Made',
+            category_id: model.category_id * -1,
+        })
         ret = await model.save()
         const updated = {
             model: await this.serializer.serialize(model),
