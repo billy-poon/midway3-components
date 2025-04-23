@@ -1,11 +1,13 @@
-import { Class } from '@midway3-components/core'
+import { Class, identity } from '@midway3-components/core'
 import { listPropertyDataFromClass, savePropertyDataToClass } from '@midwayjs/core'
 import { Options, PositionalOptions as _PositionalOptions } from 'yargs'
-import { identity, inferOptionType } from '../utils'
+import { inferOptionType } from '../utils'
 import { createParameterDecorator } from './parameter'
 
 type ArgumentOptions<T = string> = {
     type?: T
+    description?: string
+    demandOption?: boolean | string
 }
 
 type DefinitionOf<T extends ArgumentOptions> = T & {
@@ -30,16 +32,27 @@ function createArgumentDecorator<T extends ArgumentOptions>(decoratorName: strin
 
     function save(options?: T): PropertyDecorator
     function save(name: string, options?: T): PropertyDecorator & ParameterDecorator
-    function save(x?: string | T, y?: T): PropertyDecorator | ParameterDecorator {
+    function save(name: string, description: string): PropertyDecorator & ParameterDecorator
+    function save(name: string, demandOption: boolean): PropertyDecorator & ParameterDecorator
+    function save(x?: string | T, y?: T | string | boolean): PropertyDecorator | ParameterDecorator {
         const options = (
-            typeof x === 'string'
-                ? { ...y, name: x }
-                : { ...x, ...y }
+            typeof y === 'string'
+                ? { description: y }
+                : (typeof y === 'boolean'
+                    ? { demandOption: y }
+                    : { ...y }
+                )
         ) as Options
+
+        if (typeof x === 'string') {
+            options.name = x
+        } else {
+            Object.assign(options, x ?? {})
+        }
 
         return (target, propertyKey, parameterIndex) => {
             if (propertyKey == null) {{
-                throw new Error('Can only decorate a class.method().')
+                throw new Error('Can only decorate an instance method of class.')
             }}
 
             const meta: Meta = {
@@ -103,11 +116,11 @@ export type PositionalOptions = _PositionalOptions & {
 }
 export type PositionalDefinition = DefinitionOf<PositionalOptions>
 const {
-    save: PositionOption,
+    save: PositionalOption,
     list: getPositionalOptions
 } = createArgumentDecorator<PositionalOptions>('positional')
 
-export { PositionOption }
+export { PositionalOption }
 export const listPositionalOptions: typeof getPositionalOptions = (x, y) => {
     const result = getPositionalOptions(x, y)
 

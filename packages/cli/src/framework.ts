@@ -1,11 +1,11 @@
-import { Class } from '@midway3-components/core'
+import { Class, identity } from '@midway3-components/core'
 import { BaseFramework, Framework, getCurrentMainFramework, ILogger, IMidwayBootstrapOptions, MidwayLifeCycleService } from '@midwayjs/core'
 import { createInterface } from 'node:readline'
 import { hideBin } from 'yargs/helpers'
 import { NS } from './configuration'
 import { CommandDefinition, getCommandDefinition, listCommandClass, listSubCommands } from './decorator'
 import { Application, ComponentOptions, Context, Middleware, NextFunction } from './interface'
-import { delay, identity, keepProcessAlive } from './utils'
+import { delay, keepProcessAlive } from './utils'
 import yargs = require('yargs')
 
 function wrapLogger(proto: ILogger) {

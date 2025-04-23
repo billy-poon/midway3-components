@@ -41,10 +41,17 @@ importers:
         version: 5.8.2
 
   packages/core:
+    dependencies:
+      inflected:
+        specifier: ^2.1.0
+        version: 2.1.0
     devDependencies:
       '@midwayjs/core':
         specifier: '3'
         version: 3.20.3
+      '@types/inflected':
+        specifier: ^2.1.3
+        version: 2.1.3
       sequelize:
         specifier: ^6.37.7
         version: 6.37.7(mysql2@3.14.0)(pg@8.14.1)(sqlite3@5.1.7)

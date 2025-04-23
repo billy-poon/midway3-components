@@ -8,7 +8,7 @@ export function getCurrentContext<T extends Context = Context>(required: true): 
 export function getCurrentContext(required = false): Context | null {
     const result = storage.getStore() as Context
     if (result == null && required) {
-        throw new Error('Context not set.')
+        throw new Error('Current context is not set.')
     }
 
     return result ?? null

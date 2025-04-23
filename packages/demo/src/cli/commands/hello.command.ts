@@ -1,4 +1,4 @@
-import { Command, ICommand, NamedOption, PositionOption, SubCommand } from '@midway3-components/cli'
+import { Command, ICommand, NamedOption, PositionalOption, SubCommand } from '@midway3-components/cli'
 import { format } from 'util'
 
 @Command()
@@ -34,7 +34,7 @@ export class HelloCommand implements ICommand {
     async say(
         @NamedOption('from', { demandOption: true })
         from: string,
-        @PositionOption('appendix')
+        @PositionalOption('appendix')
         appendix = ''
     ) {
         return format('Hello, %s! %s - %s', this.to, appendix, from)
