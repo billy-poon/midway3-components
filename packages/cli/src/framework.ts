@@ -138,17 +138,19 @@ export class ComponentFramework extends BaseFramework<
         const {
             name, aliases,
             command, description, deprecated,
-            commandClass, commandMethod = 'exec',
+            commandClass, commandMethod,
             namedOptions, positionalOptions,
             middlewares
         } = definition
+
+        const theCommandMethod = commandMethod ?? 'exec'
 
         let theCommand = command
         if (theCommand == null) {
             let theName = name != null
                 ? name : (parentName == null
                     ? identity(commandClass.name, 'Command')
-                    : identity(String(commandMethod), 'Command')
+                    : identity(theCommandMethod, 'Command')
                 )
 
             if (parentName != null) {
@@ -167,49 +169,53 @@ export class ComponentFramework extends BaseFramework<
 
         this.logger.info('register command: %s', theCommand)
         const result: string = Array.isArray(theCommand) ? theCommand[0] : theCommand
-        this.app.command(
-            theCommand,
-            (description ?? '') as string,
-            (yargs) => {
-                this.logger.info('matched command: %s', result)
-                namedOptions.forEach(x => yargs.option(x.name, x))
-                positionalOptions.forEach(x => yargs.positional(x.name, x))
-            },
-            async (argv) => {
-                const { [CTX]: ctx } = argv
-                if (ctx == null) {
-                    throw new Error('Context is not attached.')
-                }
-                ctx.command = result
-                ctx.argv = argv
-
-                ctx.logger.info('parsed argv: %s', argv)
-                const commandMiddleware = middlewares != null
-                    ? await this.middlewareService.compose(middlewares, ctx.getApp())
-                    : undefined
-
-                const rootMiddleware = await this.applyMiddleware(commandMiddleware)
-                await rootMiddleware(ctx, async () => {
-                    const command = await ctx.requestContext.getAsync(commandClass)
-                    const method = command[commandMethod]
-                    if (typeof method !== 'function') {
-                        throw new Error(`Command method is not defined: ${commandClass.name}.${String(commandMethod)}()`)
+        if (commandMethod != null || typeof commandClass.prototype[theCommandMethod] === 'function') {
+            this.app.command(
+                theCommand,
+                (description ?? '') as string,
+                (yargs) => {
+                    this.logger.info('matched command: %s', result)
+                    namedOptions.forEach(x => yargs.option(x.name, x))
+                    positionalOptions.forEach(x => yargs.positional(x.name, x))
+                },
+                async (argv) => {
+                    const { [CTX]: ctx } = argv
+                    if (ctx == null) {
+                        throw new Error('Context is not attached.')
                     }
+                    ctx.command = result
+                    ctx.argv = argv
 
-                    ;[...namedOptions, ...positionalOptions].forEach(x => {
-                        const val = argv[x.name]
-                        if (val != null) {
-                            command[x.propertyKey] = val
+                    ctx.logger.info('parsed argv: %s', argv)
+                    const commandMiddleware = middlewares != null
+                        ? await this.middlewareService.compose(middlewares, ctx.getApp())
+                        : undefined
+
+                    const rootMiddleware = await this.applyMiddleware(commandMiddleware)
+                    await rootMiddleware(ctx, async () => {
+                        const command = await ctx.requestContext.getAsync(commandClass)
+                        const method = command[theCommandMethod]
+                        if (typeof method !== 'function') {
+                            throw new Error(`Command method is not defined: ${commandClass.name}.${String(theCommandMethod)}()`)
                         }
-                    })
 
-                    const args = argv._.slice(1)
-                    return await method.call(command, ctx, ...args)
-                })
-            },
-            undefined,
-            deprecated
-        )
+                        ;[...namedOptions, ...positionalOptions].forEach(x => {
+                            if (x.parameterIndex == null) {
+                                const val = argv[x.name]
+                                if (val != null) {
+                                    command[x.propertyKey] = val
+                                }
+                            }
+                        })
+
+                        const args = argv._.slice(1)
+                        return await method.call(command, ctx, ...args)
+                    })
+                },
+                undefined,
+                deprecated
+            )
+        }
 
         return result.split(' ', 2)[0]
     }

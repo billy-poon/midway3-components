@@ -67,7 +67,7 @@ function createArgumentDecorator<T extends ArgumentOptions>(decoratorName: strin
             .map(({ propertyKey, options }): Definition => ({
                 ...options,
                 propertyKey,
-                name: options.name ?? identity(String(propertyKey), 'Option'),
+                name: options.name ?? identity(propertyKey, 'Option'),
                 type: options.type ?? inferOptionType(clz, propertyKey)
             }))
         if (propertyKey == null) {

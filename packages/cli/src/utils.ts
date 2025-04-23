@@ -3,13 +3,21 @@ import { getMethodParamTypes, getPropertyType } from '@midwayjs/core'
 import { dasherize, underscore } from 'inflected'
 import { PositionalOptionsType } from 'yargs'
 
-export function identity(val: string, suffix = '') {
-    if (suffix !== '' && val.endsWith(suffix)) {
-        val = val.slice(0, -suffix.length)
+export function identity(val: unknown, suffix = '') {
+    let str = String(val)
+    if (typeof val === 'symbol') {
+        const [, desc] = /^Symbol\((.+)\)$/.exec(str) ?? []
+        if (desc != null) {
+            str = desc
+        }
     }
 
-    val = underscore(val)
-    return dasherize(val)
+    if (suffix !== '' && str.endsWith(suffix)) {
+        str = str.slice(0, -suffix.length)
+    }
+
+    str = underscore(str)
+    return dasherize(str)
 }
 
 export function inferOptionType(
