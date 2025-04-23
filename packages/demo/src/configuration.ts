@@ -1,4 +1,4 @@
-import * as data from '@midway3-components/core'
+import * as core from '@midway3-components/core'
 import * as drizzle from '@midway3-components/drizzle'
 import * as web from '@midway3-components/web'
 import { App, Configuration, ILifeCycle } from '@midwayjs/core'
@@ -16,7 +16,7 @@ import { registerSerializerService } from './service/serializer.service'
 @Configuration({
     imports: [
         koa,
-        data,
+        core,
         web,
         validate,
         typeorm,
@@ -39,7 +39,7 @@ export class MainConfiguration implements ILifeCycle {
         // add middleware
         this.app.useMiddleware([
             ReportMiddleware,
-            web.ContextMiddleware,
+            core.ContextMiddleware,
             web.RESTfulMiddleware,
         ])
         // add filter

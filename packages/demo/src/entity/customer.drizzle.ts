@@ -1,5 +1,5 @@
+import { getCurrentContext } from '@midway3-components/core'
 import { Column, Entity } from '@midway3-components/drizzle'
-import { getCurrentContext } from '@midway3-components/web'
 import { Context } from '@midwayjs/koa'
 import { eq, sql } from 'drizzle-orm'
 import * as schema from '../schema/pg'

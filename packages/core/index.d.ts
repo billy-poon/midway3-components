@@ -1,8 +1,8 @@
-import { ConfigurationOptions } from './dist/interface'
+import { ConfigurationOptions as core } from './dist/interface'
 
 export * from './dist/index'
 
 declare module '@midwayjs/core/dist/interface' {
-    interface MidwayConfig extends PowerPartial<ConfigurationOptions> {
+    interface MidwayConfig extends PowerPartial<core> {
     }
 }

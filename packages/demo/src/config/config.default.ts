@@ -1,4 +1,4 @@
-import { getCurrentContext } from '@midway3-components/web'
+import { getCurrentContext } from '@midway3-components/core'
 import { getCurrentMainApp, MidwayConfig } from '@midwayjs/core'
 import { config } from 'dotenv'
 import { Logger } from 'drizzle-orm'

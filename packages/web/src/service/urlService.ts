@@ -1,7 +1,7 @@
+import { getCurrentContext } from '@midway3-components/core'
 import { getCurrentApplicationContext, Init, MidwayWebRouterService, Provide, RouterInfo } from '@midwayjs/core'
 import { dasherize } from 'inflected'
 import { ParsedUrlQueryInput, stringify } from 'querystring'
-import { getCurrentContext } from '../middleware/context.middleware'
 import { template } from '../utils'
 
 type Controller = object
