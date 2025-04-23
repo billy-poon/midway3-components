@@ -29,7 +29,7 @@ type BuildActiveQuery<T extends object, K extends Table> = (query: ActiveQuery<T
     await x.afterFind(v)
 })
 class AbstractActiveRecord<T extends Table> {
-    $row?: RowOf<T>
+    #row?: RowOf<T>
 
     static db() {
         return getDataSource()
@@ -54,8 +54,12 @@ class AbstractActiveRecord<T extends Table> {
         return result
     }
 
-    static findOne<T extends typeof AbstractActiveRecord>(this: T, where: SQL) {
-        return this.find().where(where).one()
+    static findOne<T extends typeof AbstractActiveRecord>(this: T, where?: SQL | BuildActiveQuery<InstanceType<T>, TableOf<T>>) {
+        const build: BuildActiveQuery<InstanceType<T>, TableOf<T>> = typeof where === 'function'
+            ? where
+            : (q) => where != null && q.where(where)
+
+        return this.find(build).one()
     }
 
     pk(validate = true): PrimaryKeyOf<T> {
@@ -106,12 +110,12 @@ class AbstractActiveRecord<T extends Table> {
     }
 
     isNew() {
-        return this.$row == null
+        return this.#row == null
     }
 
     /** @protected */
     async afterFind(row: RowOf<T>) {
-        this.$row = row
+        this.#row = row
         Object.assign(this, row)
 
         return this
@@ -129,7 +133,7 @@ class AbstractActiveRecord<T extends Table> {
     dirtyAttributes() {
         const result = this.attributes()
 
-        const row = this.$row
+        const row = this.#row
         if (row == null) {
             return result
         }
@@ -199,7 +203,7 @@ class AbstractActiveRecord<T extends Table> {
         await this.afterFind(result)
         await this.afterSave(true, values)
 
-        return this.normalizeResult(result)
+        return 1
     }
 
     /** @protected */
@@ -240,7 +244,7 @@ class AbstractActiveRecord<T extends Table> {
         const where = this.createWhereFromPk()
         const ctor = this.constructor as typeof AbstractActiveRecord
         const model = await ctor.findOne(where)
-        await this.afterFind(model.$row as any)
+        await this.afterFind(model.#row as any)
 
         return this
     }
