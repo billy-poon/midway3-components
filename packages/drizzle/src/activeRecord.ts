@@ -292,7 +292,7 @@ export function ActiveRecord<T extends Table>(table: T, dataSource?: Drizzle | s
             return getDataSource(dataSource)
         }
 
-        static table() {
+        static table<T extends typeof AbstractActiveRecord>(this: T): TableOf<T> {
             return table as any
         }
     }
