@@ -3,6 +3,7 @@ import { and, Column, eq, SQL } from 'drizzle-orm'
 import { ActiveQuery } from './activeQuery'
 import { getDataSource } from './dataSourceManager'
 import { OnLoad } from './decorator/load'
+import { op, Operations } from './drizzle'
 import { ColumnKeyOf, ColumnsOf, Drizzle, PrimaryKeyOf, RowOf, Table } from './interface'
 import { isDrizzleColumn, isMySQL, isMySQLResult, isPostgres, isPostgresResult, isSQLite, isSQLiteResult } from './utils'
 
@@ -22,6 +23,8 @@ function getColumns<T extends Table>(table: T) {
 type TableOf<T> = T extends Class<AbstractActiveRecord<infer P>>
     ? P : never
 
+type BuildActiveQuery<T extends object, K extends Table> = (query: ActiveQuery<T>, table: K, op: Operations) => void
+
 @OnLoad<AbstractActiveRecord<any>>(async (x, v) => {
     await x.afterFind(v)
 })
@@ -40,12 +43,12 @@ class AbstractActiveRecord<T extends Table> {
         return getColumns(this.table())
     }
 
-    static find<T extends typeof AbstractActiveRecord>(this: T, build?: (query: ActiveQuery<InstanceType<T>>, table: TableOf<T>) => void) {
+    static find<T extends typeof AbstractActiveRecord>(this: T, build?: BuildActiveQuery<InstanceType<T>, TableOf<T>>) {
         const table = this.table()
         const query = this.db().select().from(table)
         const result = new ActiveQuery<InstanceType<T>>(query as any, this as any)
         if (build != null) {
-            build(result, table)
+            build(result, table, op)
         }
 
         return result

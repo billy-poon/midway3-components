@@ -2,12 +2,12 @@ import { Class, getSuperClass } from '@midway3-components/core'
 import { getClassMetadata, listPropertyDataFromClass, saveClassMetadata, savePropertyDataToClass } from '@midwayjs/core'
 import { Transform } from 'class-transformer'
 import { Column as DrizzleColumn, SQL, Table } from 'drizzle-orm'
-import { Drizzle } from '../interface'
+import { Drizzle, JoinType } from '../interface'
 import { OnLoad, OnLoadCallback } from './load'
 
 type From = Table
 type Join = {
-    type?: 'left' | 'right' | 'inner'
+    type?: JoinType
     from: From
     on: SQL
 }

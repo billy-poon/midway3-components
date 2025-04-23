@@ -2,6 +2,7 @@ export * from './activeQuery'
 export * from './activeRecord'
 export { ComponentConfiguration as Configuration } from './configuration'
 export * from './dataSourceManager'
+export * from './drizzle'
 export * from './interface'
 export * from './utils'
 
