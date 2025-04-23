@@ -98,11 +98,11 @@ export type TableConfigOf<T extends Table> = T extends Table<infer P> ? P : neve
 export type ColumnsOf<T extends Table> = TableConfigOf<T>['columns']
 export type ColumnKeyOf<T extends Table> = keyof ColumnsOf<T>
 
-type ColumnOf<T extends Table, K extends ColumnKeyOf<T>> = ColumnsOf<T>[K]
+export type ColumnOf<T extends Table, K extends ColumnKeyOf<T>> = ColumnsOf<T>[K]
 export type ColumnConfigOf<T extends Column> = T extends Column<infer P> ? P : never
 
-type ColumnDataTypeOf<T extends Column> = ColumnConfigOf<T>['data']
-type NullableColumnDataTypeOf<T extends Column> = ColumnConfigOf<T>['notNull'] extends true
+export type ColumnDataTypeOf<T extends Column> = ColumnConfigOf<T>['data']
+export type NullableColumnDataTypeOf<T extends Column> = ColumnConfigOf<T>['notNull'] extends true
     ? ColumnDataTypeOf<T>
     : ColumnDataTypeOf<T> | null
 

@@ -13,10 +13,14 @@ function CreateActiveRecord<T extends Table>(table: T) {
 }
 
 export class Category extends CreateActiveRecord(categoryTable) {
-    async beforeInsert(): Promise<boolean> {
-        if (isSQLite(Category.db())) {
-            this.category_id = 99
+    protected async beforeInsert(): Promise<boolean> {
+        if (await super.beforeInsert()) {
+            if (isSQLite(Category.db())) {
+                this.category_id = 99
+            }
+            return true
         }
-        return true
+
+        return false
     }
 }

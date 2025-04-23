@@ -25,11 +25,22 @@ type TableOf<T> = T extends Class<AbstractActiveRecord<infer P>>
 
 type BuildActiveQuery<T extends object, K extends Table> = (query: ActiveQuery<T>, table: K, op: Operations) => void
 
+export interface ActiveRecordConstructor<T extends Table> {
+    new (...args: any): AbstractActiveRecord<T> & RowOf<T>
+
+    db(): Drizzle
+    table(): T
+    columns(): ColumnsOf<T>
+
+    find<T extends ActiveRecordConstructor<any>>(this: T, build?: BuildActiveQuery<InstanceType<T>, TableOf<T>>): ActiveQuery<InstanceType<T>>
+    findOne<T extends ActiveRecordConstructor<any>>(this: T, where?: SQL | BuildActiveQuery<InstanceType<T>, TableOf<T>>): Promise<InstanceType<T>>
+}
+
 @OnLoad<AbstractActiveRecord<any>>(async (x, v) => {
     await x.afterFind(v)
 })
-class AbstractActiveRecord<T extends Table> {
-    #row?: RowOf<T>
+export class AbstractActiveRecord<T extends Table> {
+    declare readonly $row?: RowOf<T>
 
     static db() {
         return getDataSource()
@@ -92,7 +103,7 @@ class AbstractActiveRecord<T extends Table> {
         return result
     }
 
-    createWhereFromPk() {
+    protected createWhereFromPk() {
         const pk = this.pk()
 
         const ctor = this.constructor as typeof AbstractActiveRecord
@@ -110,13 +121,17 @@ class AbstractActiveRecord<T extends Table> {
     }
 
     isNew() {
-        return this.#row == null
+        return this.$row == null
     }
 
-    /** @protected */
-    async afterFind(row: RowOf<T>) {
-        this.#row = row
-        Object.assign(this, row)
+    protected async afterFind(row: RowOf<T>) {
+        const $row = { ...row }
+        Object.defineProperty(this, '$row', {
+            get: () => $row,
+            enumerable: false,
+        })
+
+        Object.assign(this, $row)
 
         return this
     }
@@ -133,7 +148,7 @@ class AbstractActiveRecord<T extends Table> {
     dirtyAttributes() {
         const result = this.attributes()
 
-        const row = this.#row
+        const row = this.$row
         if (row == null) {
             return result
         }
@@ -158,21 +173,19 @@ class AbstractActiveRecord<T extends Table> {
         return insert ? this.insert() : this.update()
     }
 
-    /** @protected */
-    async beforeSave(insert: boolean) {
+    protected async beforeSave(insert: boolean) {
         return insert
             ? this.beforeInsert()
             : this.beforeUpdate()
     }
 
-    async afterSave(insert: boolean, values: Partial<RowOf<T>>) {
+    protected async afterSave(insert: boolean, values: Partial<RowOf<T>>) {
         return insert
             ? this.afterInsert(values)
             : this.afterUpdate(values)
     }
 
-    /** @protected */
-    async insert() {
+    protected async insert() {
         const values = this.attributes()
         const ctor = this.constructor as typeof AbstractActiveRecord
 
@@ -206,16 +219,13 @@ class AbstractActiveRecord<T extends Table> {
         return 1
     }
 
-    /** @protected */
-    async beforeInsert() {
+    protected async beforeInsert() {
         return true
     }
 
-    /** @protected */
-    async afterInsert(values: Partial<RowOf<T>>) {}
+    protected async afterInsert(values: Partial<RowOf<T>>) {}
 
-    /** @protected */
-    async update() {
+    protected async update() {
         const where = this.createWhereFromPk()
         const ctor = this.constructor as typeof AbstractActiveRecord
 
@@ -232,19 +242,17 @@ class AbstractActiveRecord<T extends Table> {
         return this.normalizeResult(result)
     }
 
-    /** @protected */
-    async beforeUpdate() {
+    protected async beforeUpdate() {
         return true
     }
 
-    /** @protected */
-    async afterUpdate(values: Partial<RowOf<T>>) {}
+    protected async afterUpdate(values: Partial<RowOf<T>>) {}
 
     async refresh() {
         const where = this.createWhereFromPk()
         const ctor = this.constructor as typeof AbstractActiveRecord
         const model = await ctor.findOne(where)
-        await this.afterFind(model.#row as any)
+        await this.afterFind(model.$row as any)
 
         return this
     }
@@ -265,15 +273,13 @@ class AbstractActiveRecord<T extends Table> {
         return false
     }
 
-    /** @protected */
-    async beforeDelete() {
+    protected async beforeDelete() {
         return true
     }
 
-    /** @protected */
-    async afterDelete() {}
+    protected async afterDelete() {}
 
-    normalizeResult(result: unknown) {
+    protected normalizeResult(result: unknown) {
         const item = Array.isArray(result)
             ? result[0] : result
 
@@ -289,8 +295,9 @@ class AbstractActiveRecord<T extends Table> {
     }
 }
 
+export function ActiveRecord<T extends Table>(table: T, dataSource?: Drizzle | string): ActiveRecordConstructor<T>
 export function ActiveRecord<T extends Table>(table: T, dataSource?: Drizzle | string) {
-    const result = class extends AbstractActiveRecord<T> {
+    return class extends AbstractActiveRecord<T> {
         static db() {
             if (typeof dataSource === 'object') {
                 return dataSource
@@ -303,5 +310,4 @@ export function ActiveRecord<T extends Table>(table: T, dataSource?: Drizzle | s
             return table as any
         }
     }
-    return result as typeof result & (new (...args: any) => InstanceType<typeof result> & RowOf<T>)
 }
