@@ -37,7 +37,9 @@ export interface ActiveRecordConstructor<T extends Table> {
     columns(): ColumnsOf<T>
 
     find<T extends ActiveRecordConstructor<any>>(this: T, build?: BuildActiveQuery<T>): ActiveQuery<InstanceType<T>>
+
     findOne<T extends ActiveRecordConstructor<any>>(this: T, where?: SQL | BuildActiveQuery<T>): Promise<InstanceType<T> | null>
+    findOne<T extends ActiveRecordConstructor<any>>(this: T, where: SQL | BuildActiveQuery<T> | undefined | null, required: true): Promise<InstanceType<T>>
 }
 
 export interface AbstractActiveRecord<T extends Table> {
@@ -79,15 +81,6 @@ export class AbstractActiveRecord<T extends Table> {
         return result
     }
 
-    static async findOne<T extends Table>(
-        this: ActiveRecordConstructor<T>,
-        where?: SQL | BuildActiveQuery<typeof this>
-    ): Promise<InstanceType<typeof this> | null>
-    static async findOne<T extends Table>(
-        this: ActiveRecordConstructor<T>,
-        where: SQL | BuildActiveQuery<typeof this> | undefined | null,
-        required: true
-    ): Promise<InstanceType<typeof this>>
     static async findOne<T extends Table>(
         this: ActiveRecordConstructor<T>,
         where?: SQL | BuildActiveQuery<typeof this>,
