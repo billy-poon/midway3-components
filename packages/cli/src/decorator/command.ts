@@ -1,7 +1,8 @@
-import { Class } from '@midway3-components/core'
+import { Class, DecoratorKey } from '@midway3-components/core'
 import { getClassMetadata, listModule, Provide, saveClassMetadata, saveModule } from '@midwayjs/core'
 import { Middleware } from '../interface'
-import { listNamedOptions, listPositionalOptions } from './option'
+import { listOptions } from './option'
+import { listPositionals } from './positional'
 
 export type CommandOptions = {
     name?: string
@@ -15,6 +16,7 @@ export type CommandOptions = {
 }
 
 const key = Symbol('@midway3-components/cli:decorator:command')
+const metaKey = key as DecoratorKey<CommandOptions>
 
 export function Command(command?: string): ClassDecorator
 export function Command(options: CommandOptions): ClassDecorator
@@ -25,7 +27,7 @@ export function Command(x?: string | CommandOptions): ClassDecorator {
 
     return (target) => {
         saveModule(key, target)
-        saveClassMetadata(key, options, target)
+        saveClassMetadata(metaKey, options, target)
 
         Provide()(target)
     }
@@ -36,12 +38,12 @@ export function listCommandClass() {
 }
 
 export function getCommandDefinition(clz: Class) {
-    const options: CommandOptions | undefined = getClassMetadata(key, clz)
+    const options = getClassMetadata(metaKey, clz)
     return {
         ...options,
         commandClass: clz,
-        namedOptions: listNamedOptions(clz),
-        positionalOptions: listPositionalOptions(clz),
+        options: listOptions(clz),
+        positionals: listPositionals(clz),
     }
 }
 

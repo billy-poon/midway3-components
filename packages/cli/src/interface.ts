@@ -1,4 +1,4 @@
-import type { IMiddleware as _IMiddleware, CommonMiddleware, IConfigurationOptions, IMidwayApplication, IMidwayContext, NextFunction } from '@midwayjs/core'
+import type { IMiddleware as _IMiddleware, CommonMiddleware, FunctionMiddleware, IConfigurationOptions, IMidwayApplication, IMidwayContext, NextFunction } from '@midwayjs/core'
 import type { ArgumentsCamelCase, Argv } from 'yargs'
 
 export interface ICommand {
@@ -13,8 +13,10 @@ export type Context = IMidwayContext<{
 }>
 
 export type { NextFunction }
-export type Middleware = CommonMiddleware<Context, NextFunction, never>
-export type IMiddleware = _IMiddleware<Context, NextFunction, never>
+export type Middleware = CommonMiddleware<Context, NextFunction, unknown>
+export interface IMiddleware extends _IMiddleware<Context, NextFunction, unknown> {
+    resolve(app: IMidwayApplication, options?: any): FunctionMiddleware<Context, NextFunction> | Promise<FunctionMiddleware<Context, NextFunction>>
+}
 
 export type Args = string | readonly string[]
 export interface Application<T = {}> extends IMidwayApplication<Context, Argv<T>> {

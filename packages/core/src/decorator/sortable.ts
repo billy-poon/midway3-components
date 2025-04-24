@@ -1,6 +1,6 @@
 import { getClassMetadata, saveClassMetadata } from '@midwayjs/core'
 import { ORDER, SortableAttributes } from '../data'
-import { Class } from '../interface'
+import { Class, DecoratorKey } from '../interface'
 import { getSuperClass } from '../utils'
 
 export interface SortableOptions<T> {
@@ -37,7 +37,8 @@ export interface SortableOptions<T> {
     defaultOrder?: Record<string, ORDER>
 }
 
-const key = Symbol('@midway3-components/core:decorator:sortable')
+const key: DecoratorKey<SortableOptions<any>>
+    = Symbol('@midway3-components/core:decorator:sortable')
 
 export function Sortable<T = any>(options: SortableOptions<T>): ClassDecorator
 export function Sortable<T = any>(attributes: SortableAttributes<T>): ClassDecorator

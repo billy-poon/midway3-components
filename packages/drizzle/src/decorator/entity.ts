@@ -1,4 +1,4 @@
-import { Class, getSuperClass } from '@midway3-components/core'
+import { Class, DecoratorKey, getSuperClass } from '@midway3-components/core'
 import { getClassMetadata, listPropertyDataFromClass, saveClassMetadata, savePropertyDataToClass } from '@midwayjs/core'
 import { Transform } from 'class-transformer'
 import { Column as DrizzleColumn, SQL, Table } from 'drizzle-orm'
@@ -21,7 +21,13 @@ export type EntityOptions<T = any> = {
     dataSource?: Drizzle | string
 }
 
-const entityKey = Symbol('@midway3-components/drizzle:decorator:entity')
+type EntityMeta = {
+    from: From
+    options?: EntityOptions
+}
+
+const entityKey: DecoratorKey<EntityMeta>
+    = Symbol('@midway3-components/drizzle:decorator:entity')
 export function Entity<T extends BaseEntity = any>(from: From, options?: EntityOptions<T>): ClassDecorator {
     return (target) => {
         saveClassMetadata(entityKey, { from, options }, target)
@@ -32,13 +38,8 @@ export function Entity<T extends BaseEntity = any>(from: From, options?: EntityO
     }
 }
 
-type EntityMeta = {
-    from: From
-    options?: EntityOptions
-}
-
 export function getEntityMeta(clz: Class): EntityMeta | null {
-    const result: EntityMeta = getClassMetadata(entityKey, clz)
+    const result = getClassMetadata(entityKey, clz)
     if (result == null) {
         const superClz = getSuperClass(clz)
         if (superClz != null) {
@@ -59,7 +60,14 @@ export type ColumnOptions<T = any> = {
     readValue?: ReadValue<T>
 }
 
-const columnKey = Symbol('@midway3-components/drizzle:decorator:column')
+type ColumnMeta = {
+    column: EntityColumn
+    propertyKey: string
+    options?: ColumnOptions
+}
+
+const columnKey: DecoratorKey<ColumnMeta>
+    = Symbol('@midway3-components/drizzle:decorator:column')
 
 type EntityColumn = DrizzleColumn | SQL
 export function Column<T extends BaseEntity = any>(column: EntityColumn, options?: ColumnOptions<T>): PropertyDecorator
@@ -87,14 +95,8 @@ export function Column(column: EntityColumn, y?: ColumnOptions | ReadValue<any>)
     }
 }
 
-type ColumnMeta = {
-    column: EntityColumn
-    propertyKey: string
-    options?: ColumnOptions
-}
-
 export function getColumnsMeta(clz: Class): ColumnMeta[] {
-    const result: ColumnMeta[] = listPropertyDataFromClass(columnKey, clz)
+    const result = listPropertyDataFromClass(columnKey, clz)
 
     const superClz = getSuperClass(clz)
     if (superClz != null) {

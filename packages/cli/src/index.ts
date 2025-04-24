@@ -1,4 +1,5 @@
 export { ComponentConfiguration as Configuration } from './configuration'
 export * from './decorator'
+export * from './error/consoleError'
 export { ComponentFramework as Framework } from './framework'
 export * from './interface'

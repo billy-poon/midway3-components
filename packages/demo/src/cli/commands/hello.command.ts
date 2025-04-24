@@ -1,9 +1,12 @@
-import { Command, ICommand, NamedOption, PositionalOption, SubCommand } from '@midway3-components/cli'
+import { Command, ICommand, Option, Positional, SubCommand } from '@midway3-components/cli'
 import { format } from 'util'
 
 @Command()
 export class HelloCommand implements ICommand {
-    @NamedOption()
+    @Option()
+    from = 'A Friend'
+
+    @Positional()
     to = 'World'
 
     /**
@@ -17,7 +20,7 @@ export class HelloCommand implements ICommand {
      * ```
      */
     exec() {
-        return format('Hello, %s!', this.to)
+        return format('Hello, %s! - %s', this.to, this.from)
     }
 
     /**
@@ -25,18 +28,24 @@ export class HelloCommand implements ICommand {
      * cd packages/demo
      * pnpm build
      *
-     * pnpm cli hello/say --to=Midway.js --from="Billy Poon"
+     * pnpm demo cli hello/say Midway.js "Greets!"
      * #OR
-     * node ./bootstrap-cli.js hello/say --to=Midway.js --from="Billy Poon"
+     * cd packages/demo
+     * node ./bootstrap-cli.js hello/say Midway.js "Greets!"
      * ```
      */
     @SubCommand()
     async say(
-        @NamedOption('from', { demandOption: true })
+        // Overwrite options of class member
+        @Option('from', { default: 'Billy Poon' })
         from: string,
-        @PositionalOption('appendix')
-        appendix = ''
+        // Overwrite options of class member
+        @Positional('to', true)
+        to: string,
+        // Add a new positional option
+        @Positional('appendix')
+        appendix = '',
     ) {
-        return format('Hello, %s! %s - %s', this.to, appendix, from)
+        return format('Hello, %s! %s - %s', to, appendix, from)
     }
 }

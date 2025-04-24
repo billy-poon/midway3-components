@@ -1,4 +1,5 @@
 import { Command, ICommand, SubCommand } from '@midway3-components/cli'
+import { ActiveDataProvider } from '@midway3-components/core'
 import { Inject } from '@midwayjs/core'
 import { CategoryController } from '../../controller/api/category.controller'
 import { Category } from '../../entity/category.drizzle'
@@ -9,9 +10,11 @@ export class CategoryCommand implements ICommand {
     ctrl: CategoryController
 
     exec() {
-        return Category.find((q, t, op) => {
+        const query = Category.find((q, t, op) => {
             q.where(op.like(t.name, '%C%'))
-        }).all()
+        })
+
+        return ActiveDataProvider.create(query)
     }
 
     @SubCommand()

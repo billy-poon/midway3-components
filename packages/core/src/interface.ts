@@ -32,3 +32,19 @@ export interface ConfigurationOptions {
 }
 
 export type Class<T = any, A extends [] = any> = new (...args: A) => T
+
+// https://github.com/vuejs/core/blob/a23fb59e83c8b65b27eaa21964c8baa217ab0573/packages/runtime-core/src/apiInject.ts#L7
+interface DecoratorConstraint<T> {}
+export type DecoratorKey<T> = string | symbol | DecoratorConstraint<T>
+
+declare module '@midwayjs/core/dist/decorator/decoratorManager' {
+    export function saveModule<T>(decoratorNameKey: DecoratorKey<T>, target: T): void
+    export function listModule<T>(decoratorNameKey: DecoratorKey<T>, filter?: (module: T) => boolean): T[]
+
+    export function saveClassMetadata<T>(decoratorNameKey: DecoratorKey<T>, data: T, target: Object, mergeIfExist?: boolean): void
+    export function getClassMetadata<T>(decoratorNameKey: DecoratorKey<T>, target: Object): T | undefined
+
+    export function savePropertyDataToClass<T>(decoratorNameKey: DecoratorKey<T>, data: T, target: Object, propertyName: string | symbol): void
+    export function getPropertyDataFromClass<T>(decoratorNameKey: DecoratorKey<T>, target: Object, propertyName: string | symbol): T | undefined;
+    export function listPropertyDataFromClass<T>(decoratorNameKey: DecoratorKey<T>, target: Object): T[]
+}

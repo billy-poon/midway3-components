@@ -1,5 +1,5 @@
-import { listPropertyDataFromClass, savePropertyDataToClass, savePropertyMetadata } from '@midwayjs/core'
-import { Class } from '../interface'
+import { listPropertyDataFromClass, savePropertyDataToClass } from '@midwayjs/core'
+import { Class, DecoratorKey } from '../interface'
 import { getSuperClass } from '../utils'
 
 export interface FieldOptions<T = unknown> {
@@ -34,7 +34,10 @@ export interface FieldDefinition extends FieldOptions {
     propertyKey: string | symbol,
 }
 
-const key = Symbol('@midway3-components/core:decorator:field')
+// const key = Symbol('@midway3-components/core:decorator:field')
+const key: DecoratorKey<FieldDefinition>
+    = Symbol('@midway3-components/core:decorator:field')
+
 export function Field(name: string): PropertyDecorator
 export function Field(extra: true): PropertyDecorator
 export function Field(options?: FieldOptions): PropertyDecorator
@@ -53,7 +56,6 @@ export function Field(x?: unknown): PropertyDecorator {
         }
 
         savePropertyDataToClass(key, def, target, propertyKey)
-        savePropertyMetadata
     }
 }
 
@@ -63,7 +65,7 @@ export function getFieldDefinitions(x: unknown) {
     const clz: Class = typeof x === 'function'
         ? x : (x as any).constructor
 
-    const result = listPropertyDataFromClass(key, clz) as FieldDefinition[]
+    const result = listPropertyDataFromClass(key, clz)
 
     const superClz = getSuperClass(clz)
     if (superClz != null) {

@@ -4,6 +4,7 @@ import { createInterface } from 'node:readline'
 import { hideBin } from 'yargs/helpers'
 import { NS } from './configuration'
 import { CommandDefinition, getCommandDefinition, listCommandClass, listSubCommands } from './decorator'
+import { ConsoleError } from './error/consoleError'
 import { Application, ComponentOptions, Context, Middleware, NextFunction } from './interface'
 import { delay, keepProcessAlive } from './utils'
 import yargs = require('yargs')
@@ -77,7 +78,7 @@ export class ComponentFramework extends BaseFramework<
 
         // yargs builtin `help|--version` command hit
         app.exit = (code, err) => {
-            if (!this.#interactive) {
+            if (!this._interactive) {
                 this.destroy(code, err)
             }
         }
@@ -103,10 +104,28 @@ export class ComponentFramework extends BaseFramework<
             useMiddleware: (x: Middleware) => this.useMiddleware(x)
         })
         this.useMiddleware(async (ctx, next) => {
-            const ret = await next()
-            const result = ctx.body ?? ret
-            if (result != null) {
-                this.stdout(result)
+            try {
+                const ret = await next()
+                const result = ctx.body ?? ret
+                if (result != null) {
+                    this.stdout(result)
+                }
+            } catch (err) {
+                if (!(err instanceof ConsoleError)) {
+                    err = new ConsoleError(
+                        err?.message ?? String(err),
+                        typeof err?.exitCode === 'number' ? err.exitCode : undefined,
+                        err
+                    )
+                }
+
+                const { message, exitCode, cause } = err as ConsoleError
+
+                ctx.exitCode = exitCode
+                this.stderr(message ?? 'Error occurred.')
+                if (cause != null) {
+                    this.stderr(cause)
+                }
             }
         })
 
@@ -139,7 +158,7 @@ export class ComponentFramework extends BaseFramework<
             name, aliases,
             command, description, deprecated,
             commandClass, commandMethod,
-            namedOptions, positionalOptions,
+            options: namedOptions, positionals: positionalOptions,
             middlewares
         } = definition
 
@@ -248,14 +267,15 @@ export class ComponentFramework extends BaseFramework<
     }
 
     protected unknownCommand(command: string): void | Promise<void> {
-        throw new Error('Unknown command: ' + command)
+        this.stderr('Unknown command: %s \n\nUsage: ', command)
+        this.app.showHelp()
     }
 
-    #interactive = false
+    private _interactive = false
     async interactive() {
-        if (this.#destroy) return;
-        if (this.#interactive) return;
-        this.#interactive = true
+        if (this._destroy) return;
+        if (this._interactive) return;
+        this._interactive = true
 
         // https://nodejs.org/en/learn/command-line/accept-input-from-the-command-line-in-nodejs
         const dev = createInterface({
@@ -310,15 +330,15 @@ export class ComponentFramework extends BaseFramework<
 
         await run().finally(() => {
             dev.close()
-            this.#interactive = false
+            this._interactive = false
         })
 
         return exitCode ?? 0
     }
 
-    #destroy = false
+    private _destroy = false
     async destroy(exitCode = 0, reason?: unknown) {
-        this.#destroy = true
+        this._destroy = true
         this.logger.debug('destroying...')
 
         process.exitCode = exitCode
