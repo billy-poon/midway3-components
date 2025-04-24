@@ -7,6 +7,6 @@
     },
     "include": [
         "./typings/**/*.d.ts",
-        "./src/**/*.ts",
+        "./src/**/*.ts", "../cli/src/constants.ts",
     ]
 }

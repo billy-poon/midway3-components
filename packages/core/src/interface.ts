@@ -1,3 +1,5 @@
+import { Context } from '@midwayjs/core'
+
 export type Awaitable<T> = T | PromiseLike<T>
 
 export type RequestParameters = Record<string, unknown>
@@ -48,4 +50,17 @@ declare module '@midwayjs/core/dist/decorator/decoratorManager' {
     export function savePropertyDataToClass<T>(decoratorNameKey: DecoratorKey<T>, data: T, target: unknown, propertyName: string | symbol): void
     export function getPropertyDataFromClass<T>(decoratorNameKey: DecoratorKey<T>, target: unknown, propertyName: string | symbol): T | undefined;
     export function listPropertyDataFromClass<T>(decoratorNameKey: DecoratorKey<T>, target: unknown): T[]
+}
+
+export type LoggerInfo<T extends Context = Context> = {
+    level: string
+    timestamp: number
+    LEVEL: string
+    args: any[]
+    originArgs: any[]
+    pid: number
+    message: string
+    ctx?: T
+    originError?: Error
+    meta?: any
 }

@@ -2,7 +2,7 @@ import { Class, identity } from '@midway3-components/core'
 import { BaseFramework, Framework, getCurrentMainFramework, ILogger, MidwayLifeCycleService } from '@midwayjs/core'
 import { createInterface } from 'node:readline'
 import { hideBin } from 'yargs/helpers'
-import { NS } from './configuration'
+import { NS } from './constants'
 import { CommandDefinition, getCommandDefinition, listCommandClass, listSubCommands } from './decorator'
 import { ConsoleError } from './error/consoleError'
 import { Application, ComponentOptions, Context, Middleware, NextFunction } from './interface'
@@ -89,7 +89,7 @@ export class ComponentFramework extends BaseFramework<
                 body: null,
                 exitCode: 0,
             })
-            ctx.logger = wrapLogger(ctx.logger)
+            // ctx.logger = wrapLogger(ctx.logger)
 
             argv[CTX] = ctx
 
@@ -187,14 +187,15 @@ export class ComponentFramework extends BaseFramework<
             }
         }
 
-        this.logger.info('register command: %s', theCommand)
+        this.logger.debug('register command: %s', theCommand)
         const result: string = Array.isArray(theCommand) ? theCommand[0] : theCommand
         if (commandMethod != null || typeof commandClass.prototype[theCommandMethod] === 'function') {
             this.app.command(
                 theCommand,
                 (description ?? '') as string,
                 (args) => {
-                    this.logger.info('matched command: %s', result)
+                    this.logger.debug('matched command: %s', result)
+
                     namedOptions.forEach(x => args.option(x.name, x))
                     positionalOptions.forEach(x => args.positional(x.name, x))
                 },
@@ -206,7 +207,8 @@ export class ComponentFramework extends BaseFramework<
                     ctx.command = result
                     ctx.argv = argv
 
-                    ctx.logger.info('parsed argv: %s', argv)
+                    ctx.logger.debug('parsed argv: %s', JSON.stringify(argv))
+
                     const commandMiddleware = middlewares != null
                         ? await this.middlewareService.compose(middlewares, ctx.getApp())
                         : undefined
@@ -242,7 +244,7 @@ export class ComponentFramework extends BaseFramework<
 
     async start(parsedCb?: () => void) {
         try {
-            this.logger.debug('starting..')
+            this.logger.debug('start app')
 
             const argv = await this.app.parseAsync()
             parsedCb?.()
@@ -277,6 +279,8 @@ export class ComponentFramework extends BaseFramework<
         if (this._destroy) return;
         if (this._interactive) return;
         this._interactive = true
+
+        this.logger.debug('enter interactive mode')
 
         // https://nodejs.org/en/learn/command-line/accept-input-from-the-command-line-in-nodejs
         const dev = createInterface({
@@ -334,13 +338,16 @@ export class ComponentFramework extends BaseFramework<
             this._interactive = false
         })
 
+        this.logger.debug('exit interactive mode')
         return exitCode ?? 0
     }
 
     private _destroy = false
     async destroy(exitCode = 0, reason?: unknown) {
+        if (this._destroy) return;
+
         this._destroy = true
-        this.logger.debug('destroying...')
+        this.logger.debug('destroy app')
 
         process.exitCode = exitCode
         if (reason != null) {
@@ -371,7 +378,7 @@ export class ComponentFramework extends BaseFramework<
     }
 
     // protected async beforeStop(): Promise<void> {
-    //     this.logger.info('stopping...')
+    //     this.logger.debug('stopping...')
     // }
 
     protected clear(): void | Promise<void> {

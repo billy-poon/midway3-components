@@ -15,7 +15,7 @@ export type Context = IMidwayContext<{
 export type { NextFunction }
 export type Middleware = CommonMiddleware<Context, NextFunction, unknown>
 export interface IMiddleware extends _IMiddleware<Context, NextFunction, unknown> {
-    resolve(app: IMidwayApplication, options?: any): FunctionMiddleware<Context, NextFunction> | Promise<FunctionMiddleware<Context, NextFunction>>
+    resolve(app: Application, options?: any): FunctionMiddleware<Context, NextFunction> | Promise<FunctionMiddleware<Context, NextFunction>>
 }
 
 export type Args = string | readonly string[]

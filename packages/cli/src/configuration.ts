@@ -1,8 +1,7 @@
 import { Configuration, ILifeCycle, IMidwayContainer, MidwayDecoratorService } from '@midwayjs/core'
 import defaultConfig from './config/config.default'
+import { NS } from './constants'
 import { registerParameterDecoratorHandler } from './decorator'
-
-export const NS = '@midway3-components/cli'
 
 @Configuration({
     namespace: NS,
