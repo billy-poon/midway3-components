@@ -25,7 +25,7 @@
         "cli:publish": "pnpm lint packages/cli && pnpm cli build && pnpm cli publish --access public",
 
         "lint": "pnpm eslint ./",
-        "build:all": "pnpm core:build && pnpm web:build && pnpm drizzle:build && pnpm cli:build && pnpm demo:build",
+        "build:all": "pnpm lint && pnpm core:build && pnpm web:build && pnpm drizzle:build && pnpm cli:build && pnpm demo:build",
         "publish:all": "pnpm core:publish && pnpm web:publish && pnpm drizzle:publish && pnpm cli:publish",
 
         "test": "echo \"Error: no test specified\" && exit 1"
