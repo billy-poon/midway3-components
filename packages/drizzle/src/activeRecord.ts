@@ -26,6 +26,7 @@ type TableOf<T> = T extends ActiveRecordConstructor<infer P>
 type BuildActiveQuery<T extends ActiveRecordConstructor<any>> = (
     query: ActiveQuery<InstanceType<T>>,
     table: TableOf<T>,
+    // eslint-disable-next-line no-shadow
     op: Operations
 ) => void
 
@@ -36,10 +37,10 @@ export interface ActiveRecordConstructor<T extends Table> {
     table(): T
     columns(): ColumnsOf<T>
 
-    find<T extends ActiveRecordConstructor<any>>(this: T, build?: BuildActiveQuery<T>): ActiveQuery<InstanceType<T>>
+    find<C extends ActiveRecordConstructor<any>>(this: C, build?: BuildActiveQuery<C>): ActiveQuery<InstanceType<C>>
 
-    findOne<T extends ActiveRecordConstructor<any>>(this: T, where?: SQL | BuildActiveQuery<T>): Promise<InstanceType<T> | null>
-    findOne<T extends ActiveRecordConstructor<any>>(this: T, where: SQL | BuildActiveQuery<T> | undefined | null, required: true): Promise<InstanceType<T>>
+    findOne<C extends ActiveRecordConstructor<any>>(this: C, where?: SQL | BuildActiveQuery<C>): Promise<InstanceType<C> | null>
+    findOne<C extends ActiveRecordConstructor<any>>(this: C, where: SQL | BuildActiveQuery<C> | undefined | null, required: true): Promise<InstanceType<C>>
 }
 
 export interface AbstractActiveRecord<T extends Table> {
@@ -50,30 +51,31 @@ export interface AbstractActiveRecord<T extends Table> {
 @OnLoad<AbstractActiveRecord<any>>(async (x, v) => {
     await x.afterFind(v)
 })
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class AbstractActiveRecord<T extends Table> {
     static db() {
         return getDataSource()
     }
 
-    static table<T extends Table>(
-        this: ActiveRecordConstructor<T>
+    static table<K extends Table>(
+        this: ActiveRecordConstructor<K>
     ): TableOf<typeof this> {
         throw new Error('Table is not provided.')
     }
 
-    static columns<T extends Table>(
-        this: ActiveRecordConstructor<T>
+    static columns<K extends Table>(
+        this: ActiveRecordConstructor<K>
     ) {
         return getColumns(this.table())
     }
 
-    static find<T extends Table>(
-        this: ActiveRecordConstructor<T>,
+    static find<K extends Table>(
+        this: ActiveRecordConstructor<K>,
         build?: BuildActiveQuery<typeof this>
     ) {
         const table = this.table()
         const query = this.db().select().from(table)
-        const result = new ActiveQuery<InstanceType<ActiveRecordConstructor<T>>>(query as any, this as any)
+        const result = new ActiveQuery<InstanceType<ActiveRecordConstructor<K>>>(query as any, this as any)
         if (build != null) {
             build(result, table, op)
         }
@@ -81,8 +83,8 @@ export class AbstractActiveRecord<T extends Table> {
         return result
     }
 
-    static async findOne<T extends Table>(
-        this: ActiveRecordConstructor<T>,
+    static async findOne<K extends Table>(
+        this: ActiveRecordConstructor<K>,
         where?: SQL | BuildActiveQuery<typeof this>,
         required?: boolean
     ) {
@@ -260,6 +262,7 @@ export class AbstractActiveRecord<T extends Table> {
         return true
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected async afterInsert(values: Partial<RowOf<T>>) {}
 
     protected async update() {
@@ -284,6 +287,7 @@ export class AbstractActiveRecord<T extends Table> {
         return true
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected async afterUpdate(values: Partial<RowOf<T>>) {}
 
     async refresh() {
@@ -347,7 +351,7 @@ export function ActiveRecord<T extends Table>(table: T, dataSource?: Drizzle | s
             return getDataSource(dataSource)
         }
 
-        static table<T extends ActiveRecordConstructor<any>>(this: T): TableOf<T> {
+        static table() {
             return table as any
         }
     }

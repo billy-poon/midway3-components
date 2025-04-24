@@ -48,7 +48,7 @@ export class Sort<T = unknown> extends Parameterized implements SortOptions {
                         if (fieldOrders == null) {
                             const { name, propertyKey: field = name } = options
                             fieldOrders = (Array.isArray(field) ? field : [field])
-                                .reduce((res, x) => (res[x] = v, res), {})
+                                .reduce((_res, x) => (_res[x] = v, _res), {})
                         }
 
                         return { ...res, ...fieldOrders }

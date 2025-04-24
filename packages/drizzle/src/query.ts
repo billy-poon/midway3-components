@@ -41,9 +41,9 @@ export function entityQuery<T extends object>(clz: EntityClass<T>, dataSource?: 
 
     const { joins = [] } = options ?? {}
     if (joins.length > 0) {
-        joins.forEach(({ type = 'left', from, on }) => {
+        joins.forEach(({ type = 'left', from: _from, on }) => {
             const fn = `${type}Join` as const
-            result[fn](from, on)
+            result[fn](_from, on)
         })
     }
 

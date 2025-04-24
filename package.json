@@ -4,32 +4,37 @@
     "scripts": {
         "dev": "pnpm demo dev",
         "dev:cli": "pnpm demo dev:cli",
+
         "demo": "pnpm -F @midway3-components/demo",
         "demo:build": "pnpm demo build",
 
-        "cli": "pnpm -F @midway3-components/cli",
-        "cli:build": "pnpm cli build",
-        "cli:publish": "pnpm cli build && pnpm cli publish --access public",
-
         "core": "pnpm -F @midway3-components/core",
         "core:build": "pnpm core build",
-        "core:publish": "pnpm core build && pnpm core publish --access public",
+        "core:publish": "pnpm lint packages/core && pnpm core build && pnpm core publish --access public",
 
         "web": "pnpm -F @midway3-components/web",
         "web:build": "pnpm web build",
-        "web:publish": "pnpm web build && pnpm web publish --access public",
+        "web:publish": "pnpm lint packages/web && pnpm web build && pnpm web publish --access public",
 
         "drizzle": "pnpm -F @midway3-components/drizzle",
         "drizzle:build": "pnpm drizzle build",
-        "drizzle:publish": "pnpm drizzle build && pnpm drizzle publish --access public",
+        "drizzle:publish": "pnpm lint packages/drizzle && pnpm drizzle build && pnpm drizzle publish --access public",
 
+        "cli": "pnpm -F @midway3-components/cli",
+        "cli:build": "pnpm cli build",
+        "cli:publish": "pnpm lint packages/cli && pnpm cli build && pnpm cli publish --access public",
 
+        "lint": "pnpm eslint ./",
         "build:all": "pnpm core:build && pnpm web:build && pnpm drizzle:build && pnpm cli:build && pnpm demo:build",
         "publish:all": "pnpm core:publish && pnpm web:publish && pnpm drizzle:publish && pnpm cli:publish",
 
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "devDependencies": {
-        "mwts": "^1.3.0"
+        "@eslint/js": "^9.25.1",
+        "eslint": "^9.25.1",
+        "mwts": "^1.3.0",
+        "typescript": "^5.8.3",
+        "typescript-eslint": "^8.31.0"
     }
 }

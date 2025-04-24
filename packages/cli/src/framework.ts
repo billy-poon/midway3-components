@@ -1,5 +1,5 @@
 import { Class, identity } from '@midway3-components/core'
-import { BaseFramework, Framework, getCurrentMainFramework, ILogger, IMidwayBootstrapOptions, MidwayLifeCycleService } from '@midwayjs/core'
+import { BaseFramework, Framework, getCurrentMainFramework, ILogger, MidwayLifeCycleService } from '@midwayjs/core'
 import { createInterface } from 'node:readline'
 import { hideBin } from 'yargs/helpers'
 import { NS } from './configuration'
@@ -52,7 +52,7 @@ export class ComponentFramework extends BaseFramework<
         return this.configService.getConfiguration('cli')
     }
 
-    async applicationInitialize(options: IMidwayBootstrapOptions) {
+    async applicationInitialize() {
         this.logger = wrapLogger(this.logger)
         const {
             cwd,
@@ -112,6 +112,7 @@ export class ComponentFramework extends BaseFramework<
                 }
             } catch (err) {
                 if (!(err instanceof ConsoleError)) {
+                    // eslint-disable-next-line no-ex-assign
                     err = new ConsoleError(
                         err?.message ?? String(err),
                         typeof err?.exitCode === 'number' ? err.exitCode : undefined,
@@ -155,7 +156,7 @@ export class ComponentFramework extends BaseFramework<
 
     registerCommand(definition: CommandDefinition, parentName?: string) {
         const {
-            name, aliases,
+            name: commandName, aliases,
             command, description, deprecated,
             commandClass, commandMethod,
             options: namedOptions, positionals: positionalOptions,
@@ -166,8 +167,8 @@ export class ComponentFramework extends BaseFramework<
 
         let theCommand = command
         if (theCommand == null) {
-            let theName = name != null
-                ? name : (parentName == null
+            let theName = commandName != null
+                ? commandName : (parentName == null
                     ? identity(commandClass.name, 'Command')
                     : identity(theCommandMethod, 'Command')
                 )
@@ -192,10 +193,10 @@ export class ComponentFramework extends BaseFramework<
             this.app.command(
                 theCommand,
                 (description ?? '') as string,
-                (yargs) => {
+                (args) => {
                     this.logger.info('matched command: %s', result)
-                    namedOptions.forEach(x => yargs.option(x.name, x))
-                    positionalOptions.forEach(x => yargs.positional(x.name, x))
+                    namedOptions.forEach(x => args.option(x.name, x))
+                    positionalOptions.forEach(x => args.positional(x.name, x))
                 },
                 async (argv) => {
                     const { [CTX]: ctx } = argv
@@ -212,8 +213,8 @@ export class ComponentFramework extends BaseFramework<
 
                     const rootMiddleware = await this.applyMiddleware(commandMiddleware)
                     await rootMiddleware(ctx, async () => {
-                        const command = await ctx.requestContext.getAsync(commandClass)
-                        const method = command[theCommandMethod]
+                        const commandObj = await ctx.requestContext.getAsync(commandClass)
+                        const method = commandObj[theCommandMethod]
                         if (typeof method !== 'function') {
                             throw new Error(`Command method is not defined: ${commandClass.name}.${String(theCommandMethod)}()`)
                         }
@@ -222,13 +223,13 @@ export class ComponentFramework extends BaseFramework<
                             if (x.parameterIndex == null) {
                                 const val = argv[x.name]
                                 if (val != null) {
-                                    command[x.propertyKey] = val
+                                    commandObj[x.propertyKey] = val
                                 }
                             }
                         })
 
                         const args = argv._.slice(1)
-                        return await method.call(command, ctx, ...args)
+                        return await method.call(commandObj, ctx, ...args)
                     })
                 },
                 undefined,
@@ -252,7 +253,7 @@ export class ComponentFramework extends BaseFramework<
                 if (requestCommand == null) {
                     // don't await for `interactive` mode
                     this.interactive().then(
-                        (exitCode) => this.destroy(exitCode ?? 0)
+                        x => this.destroy(x ?? 0)
                     )
                     return;
                 }
@@ -297,9 +298,9 @@ export class ComponentFramework extends BaseFramework<
         const exitCommands = ['exit', 'quit', 'bye']
 
         const run = async () => {
-            const prompt = await providePrompt()
+            const promptVal = await providePrompt()
             return await new Promise<void>((resolve) => {
-                dev.question(prompt, async (args) => {
+                dev.question(promptVal, async (args) => {
                     try {
                         const argv = await app.parseAsync(args)
                         const { command, exitCode: _exitCode } = argv[CTX] ?? {}

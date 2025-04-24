@@ -11,8 +11,8 @@ const {
 } = createArgumentDecorator<PositionalOptions>('positional')
 
 export { Positional }
-export const listPositionals: typeof _listPositionals = (x, y) => {
-    const items = _listPositionals(x, y)
+export const listPositionals: typeof _listPositionals = (clz, propertyKey) => {
+    const items = _listPositionals(clz, propertyKey)
 
     const result = items.sort((x, y) => {
         let val = (x.order ?? 0) - (y.order ?? 0)

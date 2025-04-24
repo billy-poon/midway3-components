@@ -3,18 +3,18 @@ import { QueryInterface } from '../data/activeDataProvider'
 import { getSortableOptions, SortableOptions } from '../decorator/sortable'
 import { deepClone } from '../utils'
 
-type M<T> = (new (...args: any) => T) & typeof Model
+type ModelConstructor<T> = (new (...args: any) => T) & typeof Model
 type Arguments<T> = T extends (...args: infer P) => any ? P : never
 
 export class ActiveQuery<T extends Model> implements QueryInterface<T> {
-    static create<T extends Model>(modelClass: M<T>) {
+    static create<M extends Model>(modelClass: ModelConstructor<M>) {
         return new ActiveQuery(modelClass)
     }
 
     protected options: FindOptions<Attributes<T>> = {}
 
     constructor(
-        readonly modelClass: M<T>
+        readonly modelClass: ModelConstructor<T>
     ) { }
 
     protected invoke<F extends () => any>(fn: F, ...args: Arguments<F>): ReturnType<F> {
@@ -31,7 +31,7 @@ export class ActiveQuery<T extends Model> implements QueryInterface<T> {
         return result
     }
 
-    async count(q?: string): Promise<number> {
+    async count(): Promise<number> {
         const result = await this.invoke(this.modelClass.count<T>, this.options)
         return result
     }

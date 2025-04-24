@@ -6,7 +6,7 @@ import { getSortableOptions, SortableOptions } from '../decorator/sortable'
 import { deepClone } from '../utils'
 
 export class ActiveQuery<T extends ObjectLiteral> implements QueryInterface<T> {
-    static create<T extends ObjectLiteral>(repository: Repository<T>) {
+    static create<M extends ObjectLiteral>(repository: Repository<M>) {
         return new ActiveQuery(repository)
     }
 
@@ -72,7 +72,7 @@ export class ActiveQuery<T extends ObjectLiteral> implements QueryInterface<T> {
         return this.repository.findOne(this.options)
     }
 
-    async count(q?: string): Promise<number> {
+    async count(): Promise<number> {
         return this.repository.count(this.options)
     }
 

@@ -62,7 +62,7 @@ export async function asyncMap<T, U>(items: T[], cb: AsyncMapFn<T, U>, concurren
     }
 
     let index = 0
-    let result: U[] = []
+    const result: U[] = []
     for (const x of items) {
         const item = await cb(x, index++)
         result.push(item)

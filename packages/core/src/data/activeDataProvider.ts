@@ -18,7 +18,7 @@ export interface QueryInterface<T> {
 }
 
 export class ActiveDataProvider<T = unknown> extends BaseDataProvider<T> {
-    static create<T>(query: QueryInterface<T>) {
+    static create<M>(query: QueryInterface<M>) {
         return new ActiveDataProvider(query)
     }
 

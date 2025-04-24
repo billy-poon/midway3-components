@@ -19,6 +19,7 @@ export interface IMiddleware extends _IMiddleware<Context, NextFunction, unknown
 }
 
 export type Args = string | readonly string[]
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Application<T = {}> extends IMidwayApplication<Context, Argv<T>> {
     args: Args
     interactive: () => Promise<number>

@@ -104,6 +104,7 @@ export function ModelClass<T extends Class>(clz: T) {
             }
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         async beforeSerialize(fields: string[], expand: string[]) {}
 
         async serialize(fields: string[], expand: string[]) {

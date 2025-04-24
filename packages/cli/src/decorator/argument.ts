@@ -81,7 +81,7 @@ export function createArgumentDecorator<T extends ArgumentOptions>(decoratorName
 
     type Definition = DefinitionOf<T>
 
-    function list(clz: Class, propertyKey?: string | symbol) {
+    function list(clz: Class, methodName?: string | symbol) {
         const result = (listPropertyDataFromClass(PROP_KEY, clz) as Meta[])
             .map(({ propertyKey, options }): Definition => ({
                 ...options,
@@ -89,7 +89,7 @@ export function createArgumentDecorator<T extends ArgumentOptions>(decoratorName
                 name: options.name ?? identity(propertyKey, 'Option'),
                 type: options.type ?? inferOptionType(clz, propertyKey)
             }))
-        if (propertyKey == null) {
+        if (methodName == null) {
             return result
         }
 
@@ -97,7 +97,7 @@ export function createArgumentDecorator<T extends ArgumentOptions>(decoratorName
             .reduce<Definition[]>(
                 (res, x) => {
                     x.forEach(({ propertyKey, options }) => {
-                        if (propertyKey === propertyKey) {
+                        if (propertyKey === methodName) {
                             res.push({
                                 ...options,
                                 propertyKey,

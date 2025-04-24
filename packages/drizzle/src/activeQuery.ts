@@ -19,12 +19,12 @@ export type QueryConfig = {
 }
 
 export type QuerySession = {
-    count(sql: SQL): Promise<number>
+    count(sqlText: SQL): Promise<number>
 }
 
 
 export class ActiveQuery<T extends object> implements QueryInterface<T> {
-    static create<T extends object>(entityClz: EntityClass<T>): ActiveQuery<Query<T>>
+    static create<M extends object>(entityClz: EntityClass<M>): ActiveQuery<Query<M>>
     static create<Q extends Query>(query: Q): ActiveQuery<QueryResult<Q>>
     static create(x: any) {
         const modelClass = isClass(x) ? x : undefined

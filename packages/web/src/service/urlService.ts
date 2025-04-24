@@ -17,6 +17,7 @@ type ActionOf<T> = T extends Controller
     : string | symbol
 
 declare module '@midwayjs/core' {
+    // eslint-disable-next-line no-shadow
     interface RouterInfo {
         keys?: {
             ctrlKey: string
@@ -171,13 +172,14 @@ export class UrlService {
     to<T extends Controller>(route: [T | ControllerClass<T>, ActionOf<T>], options?: RouteOptions): string
     to(x: unknown, y?: RouteOptions) {
         if (Array.isArray(x)) {
-            let [ctrl, action = ''] = x as [string, string]
+            const [ctrl, _action = ''] = x as [string, string]
+            let action = _action
             if (typeof ctrl === 'string' && action === '') {
-                const [, _action = ''] = ctrl.split('/', 2)
-                if (_action === '') {
+                const [, __action = ''] = ctrl.split('/', 2)
+                if (__action === '') {
                     throw new Error('Failed to extract action from route: ' + ctrl)
                 }
-                action = _action
+                action = __action
             }
             const factory = this.action(ctrl, action)
             return factory(y)
@@ -197,7 +199,7 @@ export class UrlService {
                 const val = params[key]
                 return val == null
                     ? match : encodeURIComponent(String(val))
-            }, /\:(\w+)/)
+            }, /:(\w+)/)
         }
 
         if (query != null) {

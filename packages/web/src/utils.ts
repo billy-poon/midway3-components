@@ -12,6 +12,7 @@ export function isStream(val: unknown): val is Readable {
 
 
 interface FormatSupported {
+    // eslint-disable-next-line no-shadow
     format(template: string): unknown
 }
 
@@ -49,6 +50,7 @@ function getPropertyValue(data: object, key: PropertyKey) {
 type DataProvider = (key: string, match: string) => unknown
 
 const templateRe = /\{ *([\w-.:]+) *\}/g
+// eslint-disable-next-line no-shadow
 export function template(format: string, data: object | DataProvider, regex?: RegExp, defaultVal?: string) {
     const provide: DataProvider = typeof data === 'function'
         ? data as DataProvider
