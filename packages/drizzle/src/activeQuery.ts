@@ -2,15 +2,16 @@ import { Class, getSortableOptions, QueryInterface, SortableOptions } from '@mid
 import { ORDER } from '@midway3-components/core/dist/data'
 import { isClass } from '@midwayjs/core/dist/util/types'
 import { plainToInstance } from 'class-transformer'
-import { asc, desc, Placeholder, SQL, sql, SQLWrapper } from 'drizzle-orm'
+import { and, asc, desc, eq, isNull, isSQLWrapper, Placeholder, SQL, sql, SQLWrapper } from 'drizzle-orm'
 import { EntityClass } from './decorator/entity'
 import { triggerOnLoad } from './decorator/load'
 import { Query, QueryResult } from './interface'
 import { entityQuery } from './query'
 import { isDrizzleColumn } from './utils'
 
+type Fields = Record<string, unknown>
 export type QueryConfig = {
-    fields?: Record<string, unknown>
+    fields?: Fields
 
     where?: SQL
     limit?: number | Placeholder
@@ -22,6 +23,21 @@ export type QuerySession = {
     count(sqlText: SQL): Promise<number>
 }
 
+type Condition<T extends object> = SQL | Partial<T>
+function buildCondition(data: object, fields: Fields): SQL | undefined {
+    const items = Object.entries(data)
+        .map(([k, v]) => {
+            const column = fields[k]
+            if (isDrizzleColumn(column)) {
+                return v == null
+                    ? isNull(column)
+                    : eq(column, v)
+            }
+            throw new Error('Property is not bound to a table column: ' + k)
+        })
+
+    return and(...items)
+}
 
 export class ActiveQuery<T extends object> implements QueryInterface<T> {
     static create<M extends object>(entityClz: EntityClass<M>): ActiveQuery<Query<M>>
@@ -48,7 +64,14 @@ export class ActiveQuery<T extends object> implements QueryInterface<T> {
         return this.query['config'] ?? {}
     }
 
-    where(where: SQL): this {
+    where(condition: Condition<T> | null): this {
+        const where = condition == null
+            ? undefined : (
+                isSQLWrapper(condition)
+                    ? (condition as SQL)
+                    : buildCondition(condition, this.getConfig())
+        )
+
         this.query.where(where)
         return this
     }
@@ -149,7 +172,7 @@ type Executable = {
     execute(...args: any): any
 }
 
-const FLAG = Symbol('activeQuery::patchQuery')
+const FLAG = Symbol('@midway3-components/core:ActiveQuery::patchQuery')
 function patchQuery<T extends Executable>(query: T, modelClass: Class): T {
     const original = query.execute
     if (original[FLAG] === undefined) {

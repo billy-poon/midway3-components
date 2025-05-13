@@ -29,7 +29,7 @@ export class ProxyModel extends AbstractModel {
     }
 }
 
-const classType = Symbol('class-type:model')
+const classType = Symbol('@midway3-components/core:model')
 
 export function ModelClass<T extends Class>(clz: T) {
     return class extends clz {

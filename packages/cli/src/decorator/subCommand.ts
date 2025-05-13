@@ -10,7 +10,7 @@ type Meta = {
 }
 
 const key: DecoratorKey<Meta>
-    = Symbol('@midway3-components/cli:decorator:sub-command')
+    = '@midway3-components/cli:decorator:sub-command'
 
 export function SubCommand(command?: string): MethodDecorator
 export function SubCommand(options: CommandOptions): MethodDecorator

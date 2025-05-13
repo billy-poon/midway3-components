@@ -1,4 +1,4 @@
-import { Command, ICommand, SubCommand } from '@midway3-components/cli'
+import { Command, ICommand, Positional, SubCommand } from '@midway3-components/cli'
 import { ActiveDataProvider } from '@midway3-components/core'
 import { Inject } from '@midwayjs/core'
 import { CategoryController } from '../../controller/api/category.controller'
@@ -15,6 +15,15 @@ export class CategoryCommand implements ICommand {
         })
 
         return ActiveDataProvider.create(query)
+    }
+
+    @SubCommand()
+    async view(
+        @Positional('id')
+        category_id: number
+    ) {
+        const result = await Category.findOne({ category_id }, true)
+        return result
     }
 
     @SubCommand()

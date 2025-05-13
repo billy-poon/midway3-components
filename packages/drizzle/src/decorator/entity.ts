@@ -27,7 +27,7 @@ type EntityMeta = {
 }
 
 const entityKey: DecoratorKey<EntityMeta>
-    = Symbol('@midway3-components/drizzle:decorator:entity')
+    = '@midway3-components/drizzle:decorator:entity'
 export function Entity<T extends BaseEntity = any>(from: From, options?: EntityOptions<T>): ClassDecorator {
     return (target) => {
         saveClassMetadata(entityKey, { from, options }, target)
@@ -67,7 +67,7 @@ type ColumnMeta = {
 }
 
 const columnKey: DecoratorKey<ColumnMeta>
-    = Symbol('@midway3-components/drizzle:decorator:column')
+    = '@midway3-components/drizzle:decorator:column'
 
 type EntityColumn = DrizzleColumn | SQL
 export function Column<T extends BaseEntity = any>(column: EntityColumn, options?: ColumnOptions<T>): PropertyDecorator

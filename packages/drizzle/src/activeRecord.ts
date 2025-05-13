@@ -23,24 +23,37 @@ function getColumns<T extends Table>(table: T) {
 type TableOf<T> = T extends ActiveRecordConstructor<infer P>
     ? P : never
 
-type BuildActiveQuery<T extends ActiveRecordConstructor<any>> = (
+type BuildQuery<T extends ActiveRecordConstructor> = (
     query: ActiveQuery<InstanceType<T>>,
     table: TableOf<T>,
     // eslint-disable-next-line no-shadow
     op: Operations
 ) => void
 
-export interface ActiveRecordConstructor<T extends Table> {
+type Condition<T extends ActiveRecordConstructor> =
+    | SQL
+    | BuildQuery<T>
+    | Partial<RowOf<TableOf<T>>>
+
+function normalizeCondition<T extends ActiveRecordConstructor>(val: Condition<T>): BuildQuery<T> {
+    return typeof val === 'function'
+        ? val
+        : q => q.where(val as any)
+}
+
+export interface ActiveRecordConstructor<T extends Table = any> {
     new (...args: any): AbstractActiveRecord<T> & RowOf<T>
 
     db(): Drizzle
     table(): T
     columns(): ColumnsOf<T>
 
-    find<C extends ActiveRecordConstructor<any>>(this: C, build?: BuildActiveQuery<C>): ActiveQuery<InstanceType<C>>
+    find<C extends ActiveRecordConstructor>(this: C, build?: BuildQuery<C>): ActiveQuery<InstanceType<C>>
 
-    findOne<C extends ActiveRecordConstructor<any>>(this: C, where?: SQL | BuildActiveQuery<C>): Promise<InstanceType<C> | null>
-    findOne<C extends ActiveRecordConstructor<any>>(this: C, where: SQL | BuildActiveQuery<C> | undefined | null, required: true): Promise<InstanceType<C>>
+    findOne<C extends ActiveRecordConstructor>(this: C, condition?: Condition<C>): Promise<InstanceType<C> | null>
+    findOne<C extends ActiveRecordConstructor>(this: C, condition: Condition<C> | undefined | null, required: true): Promise<InstanceType<C>>
+
+    findAll<C extends ActiveRecordConstructor>(this: C, condition?: Condition<C>): Promise<InstanceType<C>[]>
 }
 
 export interface AbstractActiveRecord<T extends Table> {
@@ -71,11 +84,11 @@ export class AbstractActiveRecord<T extends Table> {
 
     static find<K extends Table>(
         this: ActiveRecordConstructor<K>,
-        build?: BuildActiveQuery<typeof this>
+        build?: BuildQuery<typeof this>
     ) {
         const table = this.table()
         const query = this.db().select().from(table)
-        const result = new ActiveQuery<InstanceType<ActiveRecordConstructor<K>>>(query as any, this as any)
+        const result = new ActiveQuery<InstanceType<typeof this>>(query as any, this)
         if (build != null) {
             build(result, table, op)
         }
@@ -85,18 +98,30 @@ export class AbstractActiveRecord<T extends Table> {
 
     static async findOne<K extends Table>(
         this: ActiveRecordConstructor<K>,
-        where?: SQL | BuildActiveQuery<typeof this>,
+        condition?: Condition<typeof this>,
         required?: boolean
     ) {
-        const build: BuildActiveQuery<typeof this> = typeof where === 'function'
-            ? where
-            : (q) => where != null && q.where(where)
+        const build = condition != null
+            ? normalizeCondition(condition)
+            : undefined
 
         const result = await this.find(build).one()
         if (result == null && required) {
             throw new Error('Object not found.')
         }
 
+        return result
+    }
+
+    static async findAll<K extends Table>(
+        this: ActiveRecordConstructor<K>,
+        condition?: Condition<typeof this>
+    ) {
+        const build = condition != null
+            ? normalizeCondition(condition)
+            : undefined
+
+        const result = await this.find(build).all()
         return result
     }
 

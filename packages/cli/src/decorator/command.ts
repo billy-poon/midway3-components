@@ -15,7 +15,7 @@ export type CommandOptions = {
     commandMethod?: string | symbol
 }
 
-const key = Symbol('@midway3-components/cli:decorator:command')
+const key = '@midway3-components/cli:decorator:command'
 const metaKey = key as DecoratorKey<CommandOptions>
 
 export function Command(command?: string): ClassDecorator

@@ -8,7 +8,7 @@ type Meta = {
 }
 
 const key: DecoratorKey<Meta>
-    = Symbol('@midway3-components/drizzle:decorator:on-load')
+    = '@midway3-components/drizzle:decorator:on-load'
 
 export function OnLoad<T = any>(cb: OnLoadCallback<T>): ClassDecorator {
     return (target) => {
