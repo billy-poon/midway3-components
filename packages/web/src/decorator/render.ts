@@ -80,9 +80,9 @@ export function registerRenderHandler(service: MidwayDecoratorService) {
                 throw new Error('Failed to resolve request context.')
             }
 
-            const identity = getProviderUUId(controller.constructor)
-            const definition = context.requestContext.registry.getDefinition(identity)
-                ?? getCurrentApplicationContext().registry.getDefinition(identity)
+            const uuid = getProviderUUId(controller.constructor)
+            const definition = context.requestContext.registry.getDefinition(uuid)
+                ?? getCurrentApplicationContext().registry.getDefinition(uuid)
 
             const requestMethod = (context.request?.method ?? '') as RequestMethod
             const factory: RenderOptionsFactory = opt.metadata
