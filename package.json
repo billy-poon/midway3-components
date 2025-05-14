@@ -5,6 +5,8 @@
         "dev": "pnpm demo dev",
         "dev:cli": "pnpm demo dev:cli",
 
+        "start:cli": "pnpm demo cli",
+
         "demo": "pnpm -F @midway3-components/demo",
         "demo:build": "pnpm demo build",
 
@@ -13,7 +15,7 @@
         "core:publish": "pnpm lint packages/core && pnpm core build && pnpm core publish --access public",
 
         "web": "pnpm -F @midway3-components/web",
-        "web:build": "pnpm web build",
+        "web:build": "pnpm web build && touch packages/demo/src/configuration.ts",
         "web:publish": "pnpm lint packages/web && pnpm web build && pnpm web publish --access public",
 
         "drizzle": "pnpm -F @midway3-components/drizzle",

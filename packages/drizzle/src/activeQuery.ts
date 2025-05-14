@@ -1,30 +1,21 @@
-import { Class, getSortableOptions, QueryInterface, SortableOptions } from '@midway3-components/core'
+import { Class, configure, getSortableOptions, QueryInterface, SortableOptions } from '@midway3-components/core'
 import { ORDER } from '@midway3-components/core/dist/data'
 import { isClass } from '@midwayjs/core/dist/util/types'
 import { plainToInstance } from 'class-transformer'
-import { and, asc, desc, eq, isNull, isSQLWrapper, Placeholder, SQL, sql, SQLWrapper } from 'drizzle-orm'
+import { and, asc, desc, eq, isNull, isSQLWrapper, SQL, sql } from 'drizzle-orm'
 import { EntityClass } from './decorator/entity'
 import { triggerOnLoad } from './decorator/load'
-import { Query, QueryResult } from './interface'
-import { entityQuery } from './query'
+import { createQuery, Query, QueryConfig, QueryResultOf, QuerySession } from './query'
+import { ActiveRecordOf, RowOf, SelectedFields } from './types'
 import { isDrizzleColumn } from './utils'
 
-type Fields = Record<string, unknown>
-export type QueryConfig = {
-    fields?: Fields
+export type Condition<T extends object> =
+    | SQL
+    | Partial<
+        T extends ActiveRecordOf<infer P> ? RowOf<P> : T
+    >
 
-    where?: SQL
-    limit?: number | Placeholder
-    offset?: number | Placeholder
-    orderBy?: SQLWrapper[]
-}
-
-export type QuerySession = {
-    count(sqlText: SQL): Promise<number>
-}
-
-type Condition<T extends object> = SQL | Partial<T>
-function buildCondition(data: object, fields: Fields): SQL | undefined {
+function buildCondition(data: object, fields: SelectedFields): SQL | undefined {
     const items = Object.entries(data)
         .map(([k, v]) => {
             const column = fields[k]
@@ -41,11 +32,11 @@ function buildCondition(data: object, fields: Fields): SQL | undefined {
 
 export class ActiveQuery<T extends object> implements QueryInterface<T> {
     static create<M extends object>(entityClz: EntityClass<M>): ActiveQuery<Query<M>>
-    static create<Q extends Query>(query: Q): ActiveQuery<QueryResult<Q>>
+    static create<Q extends Query<object>>(query: Q): ActiveQuery<QueryResultOf<Q>>
     static create(x: any) {
         const modelClass = isClass(x) ? x : undefined
         const query: Query<any> = isClass(x)
-            ? entityQuery(x)
+            ? createQuery(x)
             : x
 
         return new ActiveQuery(query, modelClass)
@@ -61,7 +52,16 @@ export class ActiveQuery<T extends object> implements QueryInterface<T> {
     }
 
     protected getConfig(): QueryConfig {
-        return this.query['config'] ?? {}
+        const result = this.query['config']
+        if (typeof result !== 'object') {
+            throw new Error('Failed to resolve query[config].')
+        }
+
+        return result
+    }
+
+    protected setConfig(val: Partial<QueryConfig>) {
+        configure(this.getConfig(), val)
     }
 
     where(condition: Condition<T> | null): this {
@@ -69,7 +69,7 @@ export class ActiveQuery<T extends object> implements QueryInterface<T> {
             ? undefined : (
                 isSQLWrapper(condition)
                     ? (condition as SQL)
-                    : buildCondition(condition, this.getConfig())
+                    : buildCondition(condition, this.getConfig().fields)
         )
 
         this.query.where(where)
@@ -80,7 +80,7 @@ export class ActiveQuery<T extends object> implements QueryInterface<T> {
         if (value != null) {
             this.query.limit(value)
         } else {
-            this.getConfig()['limit'] = undefined
+            this.setConfig({ limit: undefined })
         }
         return this
     }
@@ -89,7 +89,7 @@ export class ActiveQuery<T extends object> implements QueryInterface<T> {
         if (value != null) {
             this.query.offset(value)
         } else {
-            this.getConfig()['offset'] = undefined
+            this.setConfig({ offset: undefined })
         }
         return this
     }
@@ -112,22 +112,21 @@ export class ActiveQuery<T extends object> implements QueryInterface<T> {
                 })
             this.query.orderBy(...items)
         } else {
-            this.getConfig()['orderBy'] = undefined
+            this.setConfig({ orderBy: undefined })
         }
 
         return this
     }
 
     addOrderBy(value: Record<string, ORDER>): this {
-        const getOrderBy = () => this.query['config']['orderBy'] ?? []
+        const getOrderBy = () => this.getConfig().orderBy ?? []
 
         const items = getOrderBy()
-
         this.orderBy(value)
-        this.query['config']['orderBy'] = [
-            ...items,
-            ...getOrderBy(),
-        ]
+
+        this.setConfig({
+            orderBy: [...items, ...getOrderBy()]
+        })
 
         return this
     }
@@ -156,8 +155,8 @@ export class ActiveQuery<T extends object> implements QueryInterface<T> {
 
     protected getSession(): QuerySession {
         const result = this.query['session']
-        if (result == null) {
-            throw new Error('Failed to resolve session.')
+        if (typeof result !== 'object') {
+            throw new Error('Failed to resolve query[session].')
         }
 
         return result

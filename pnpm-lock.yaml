@@ -106,6 +106,9 @@ importers:
       '@midwayjs/validate':
         specifier: ^3.12.0
         version: 3.20.3
+      '@midwayjs/view-nunjucks':
+        specifier: ^3.20.5
+        version: 3.20.5(chokidar@3.6.0)
       dayjs:
         specifier: ^1.11.13
         version: 1.11.13
@@ -198,6 +201,9 @@ importers:
       '@midwayjs/core':
         specifier: '3'
         version: 3.20.3
+      '@midwayjs/view':
+        specifier: ^3.20.5
+        version: 3.20.5
       '@types/node':
         specifier: ^22.13.14
         version: 22.13.14
@@ -681,6 +687,14 @@ packages:
     resolution: {integrity: sha512-xbk0puUh6IU5E/D2w6jSl5bNEgzAXTEuau+dIz0HxPV7EylKdRk3n2DQ4HBV3x4rFKWf/AibBs5tnR3yQfaptQ==}
     engines: {node: '>=12'}
 
+  '@midwayjs/view-nunjucks@3.20.5':
+    resolution: {integrity: sha512-r5MczgQ/xV1HIbG4lnVarlCJpX1cJL/G8NwNAGhXqcYCslnJomcjr/FnpANmCl2Osl8qveXPPw7KcNm/QiRvgQ==}
+    engines: {node: '>=12'}
+
+  '@midwayjs/view@3.20.5':
+    resolution: {integrity: sha512-CksS2+X+KayZVqwLwIE2cw6bWKXbFYBYt8po223YdVRwS4lHP/7ItuUYoqLYW1FQFJz5tp0k+VspFD7k3kFkrQ==}
+    engines: {node: '>=12'}
+
   '@neon-rs/load@0.0.4':
     resolution: {integrity: sha512-kTPhdZyTQxB+2wpiRcFWrDcejc4JI6tkPuS7UZCG4l6Zvc5kU/gGQ/ozvHTh1XR5tS+UlfAfGuPajjzQjCiHCw==}
 
@@ -986,6 +1000,9 @@ packages:
   '@typescript-eslint/visitor-keys@8.31.0':
     resolution: {integrity: sha512-QcGHmlRHWOl93o64ZUMNewCdwKGU6WItOU52H0djgNmn1EOrhVudrDzXz4OycCRSCPwFCDrE2iIt5vmuUdHxuQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  a-sync-waterfall@1.0.1:
+    resolution: {integrity: sha512-RYTOHHdWipFUliRFMCS4X2Yn2X8M87V/OpSqWzKKOGhzqyUxzyVmhHDH9sAvG+ZuQf/TAOFsLCpMw09I1ufUnA==}
 
   abbrev@1.1.1:
     resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
@@ -1333,6 +1350,10 @@ packages:
   combined-stream@1.0.8:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
     engines: {node: '>= 0.8'}
+
+  commander@5.1.0:
+    resolution: {integrity: sha512-P0CysNDQ7rtVw4QIQtm+MRxV66vKFSvlsQvGYXZWR3qFU0jlMKHZZZgw8e+8DSah4UDKMqnknRDQz+xuQXQ/Zg==}
+    engines: {node: '>= 6'}
 
   commander@9.5.0:
     resolution: {integrity: sha512-KRs7WVDKg86PWiuAqhDrAQnTXZKraVcCc6vFdL14qrZ/DcWwuRo7VoiYXalXO7S5GKpqYiVEwCbgFDfxNHKJBQ==}
@@ -2838,6 +2859,16 @@ packages:
     resolution: {integrity: sha512-/vBvz5Jfr9dT/aFWd0FIRf+T/Q2WBsLENygUaFUqstqsycmZAP/t5BvFJTK0viFmSUxiUKTUplWy5vt+rvKIxg==}
     engines: {node: ^12.13.0 || ^14.15.0 || >=16.0.0}
     deprecated: This package is no longer supported.
+
+  nunjucks@3.2.4:
+    resolution: {integrity: sha512-26XRV6BhkgK0VOxfbU5cQI+ICFUtMLixv1noZn1tGU38kQH5A5nmmbk/O45xdyBhD1esk47nKrY0mvQpZIhRjQ==}
+    engines: {node: '>= 6.9.0'}
+    hasBin: true
+    peerDependencies:
+      chokidar: ^3.3.0
+    peerDependenciesMeta:
+      chokidar:
+        optional: true
 
   object-inspect@1.13.4:
     resolution: {integrity: sha512-W67iLl4J2EXEGTbfeHCffrjDfitvLANg0UlX3wFUUSTx92KXRFegMHUVgSqE+wvhAbi4WqjGg9czysTV2Epbew==}
@@ -4550,6 +4581,15 @@ snapshots:
       '@midwayjs/i18n': 3.20.3
       joi: 17.13.3
 
+  '@midwayjs/view-nunjucks@3.20.5(chokidar@3.6.0)':
+    dependencies:
+      '@midwayjs/view': 3.20.5
+      nunjucks: 3.2.4(chokidar@3.6.0)
+    transitivePeerDependencies:
+      - chokidar
+
+  '@midwayjs/view@3.20.5': {}
+
   '@neon-rs/load@0.0.4': {}
 
   '@nodelib/fs.scandir@2.1.5':
@@ -4784,10 +4824,10 @@ snapshots:
     dependencies:
       '@types/yargs-parser': 21.0.3
 
-  '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@7.32.0)(typescript@5.8.3))(eslint@7.32.0)(typescript@4.8.4)':
+  '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@7.32.0)(typescript@4.8.4))(eslint@7.32.0)(typescript@4.8.4)':
     dependencies:
       '@eslint-community/regexpp': 4.12.1
-      '@typescript-eslint/parser': 5.62.0(eslint@7.32.0)(typescript@5.8.3)
+      '@typescript-eslint/parser': 5.62.0(eslint@7.32.0)(typescript@4.8.4)
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/type-utils': 5.62.0(eslint@7.32.0)(typescript@4.8.4)
       '@typescript-eslint/utils': 5.62.0(eslint@7.32.0)(typescript@4.8.4)
@@ -5016,6 +5056,8 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.31.0
       eslint-visitor-keys: 4.2.0
+
+  a-sync-waterfall@1.0.1: {}
 
   abbrev@1.1.1:
     optional: true
@@ -5423,6 +5465,8 @@ snapshots:
   combined-stream@1.0.8:
     dependencies:
       delayed-stream: 1.0.0
+
+  commander@5.1.0: {}
 
   commander@9.5.0: {}
 
@@ -7042,7 +7086,7 @@ snapshots:
 
   mwts@1.3.0(typescript@4.8.4):
     dependencies:
-      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@7.32.0)(typescript@5.8.3))(eslint@7.32.0)(typescript@4.8.4)
+      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@7.32.0)(typescript@4.8.4))(eslint@7.32.0)(typescript@4.8.4)
       '@typescript-eslint/parser': 5.62.0(eslint@7.32.0)(typescript@4.8.4)
       chalk: 4.1.2
       eslint: 7.32.0
@@ -7197,6 +7241,14 @@ snapshots:
       gauge: 4.0.4
       set-blocking: 2.0.0
     optional: true
+
+  nunjucks@3.2.4(chokidar@3.6.0):
+    dependencies:
+      a-sync-waterfall: 1.0.1
+      asap: 2.0.6
+      commander: 5.1.0
+    optionalDependencies:
+      chokidar: 3.6.0
 
   object-inspect@1.13.4: {}
 

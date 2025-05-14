@@ -1,7 +1,15 @@
+import { IViewEngine } from '@midwayjs/view'
+
 export { }
 
+interface Request {
+    method?: string
+}
+
 declare module '@midwayjs/core/dist/interface' {
-    interface Context {
+    interface Context extends IViewEngine {
+        request?: Request
+
         path?: string
         method?: string
         origin?: string

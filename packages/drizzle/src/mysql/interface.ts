@@ -1,7 +1,7 @@
 import type { MySql2Database, MySql2DrizzleConfig } from 'drizzle-orm/mysql2'
 import type { Connection as CallbackConnection, Pool as CallbackPool, PoolOptions } from 'mysql2'
 import type { Connection, Pool } from 'mysql2/promise'
-import type { Schema } from '../interface'
+import type { Schema } from '../types'
 
 export type MySql2Connection = Pool | Connection | CallbackPool | CallbackConnection
 
@@ -16,4 +16,14 @@ export type MySQL2DataSourceOptions<TSchema extends Schema = Schema> =
 
 export type MySQL2Drizzle<TSchema extends Schema = Schema> = MySql2Database<TSchema> & {
     $client: MySql2Connection
+}
+
+export interface MySQLExecuteResult {
+    info: string
+    insertId: number
+    fieldCount: number
+    affectedRows: number
+    changedRows: number
+    warningStatus: number
+    serverStatus: number
 }

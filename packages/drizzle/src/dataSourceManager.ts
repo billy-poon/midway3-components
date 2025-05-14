@@ -1,5 +1,7 @@
 import { Config, DataSourceManager, getCurrentApplicationContext, ILogger, Init, Inject, Logger, Provide, Scope, ScopeEnum } from '@midwayjs/core'
-import { ConfigurationOptions, DialectType, Drizzle, DrizzleDataSourceOptions } from './interface'
+import { DialectType, sqliteProtocols } from './dialects'
+import { Drizzle, DrizzleDataSourceOptions } from './drizzle'
+import { DrizzleConfigOptions } from './interface'
 
 @Provide()
 @Scope(ScopeEnum.Singleton)
@@ -11,7 +13,7 @@ export class DrizzleDataSourceManager extends DataSourceManager<Drizzle> {
     baseDir: string
 
     @Config('drizzle')
-    configOptions: ConfigurationOptions['drizzle']
+    configOptions: DrizzleConfigOptions
 
     @Init()
     async init() {
@@ -86,7 +88,7 @@ function parseType(connection: string): DialectType {
     const [, dialect] = /^(\w+):\/\//.exec(connection.toLowerCase()) ?? []
     if (dialect === 'postgres') {
         return 'postgresql'
-    } else if (dialect === 'file') {
+    } else if (sqliteProtocols.includes(dialect as any)) {
         return 'sqlite'
     }
 

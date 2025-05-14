@@ -2,9 +2,14 @@ import { Context, IMiddleware, Middleware, NextFunction } from '@midwayjs/core'
 import { SerializerService } from '../service/serializerService'
 import { isStream } from '../utils'
 
+type _Middleware = IMiddleware<Context, NextFunction>
+
 interface Options {
     pretty?: boolean
     space?: number | string
+
+    match?: _Middleware['match']
+    ignore?: _Middleware['ignore']
 }
 
 function jsonSupported(val: unknown) {
@@ -16,12 +21,24 @@ function jsonSupported(val: unknown) {
 }
 
 @Middleware()
-export class RESTfulMiddleware implements IMiddleware<Context, NextFunction> {
+export class RESTfulMiddleware implements _Middleware {
+    match?: _Middleware['match']
+    ignore?: _Middleware['ignore']
+
     resolve(_app: unknown, options?: Options) {
         const {
             pretty = process.env.NODE_ENV === 'local',
             space = 4,
+            match,
+            ignore
         } = options ?? {}
+
+        if (match != null) {
+            this.match = match
+        }
+        if (ignore != null) {
+            this.ignore = ignore
+        }
 
         return async (ctx: Context, next: NextFunction) => {
             const retVal = await next()

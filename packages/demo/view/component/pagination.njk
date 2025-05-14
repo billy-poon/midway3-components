@@ -1,0 +1,44 @@
+{% macro pagination(p) %}
+
+{% if p and p.getPageCount() > 0 %}
+{% set page = p.getPage() + 1 %}
+{% set pageCount = p.getPageCount() %}
+
+<ul class="pagination">
+    <style>
+        .pagination {
+            padding: 0;
+            list-style: none;
+        }
+
+        .pagination > li {
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .pagination .page-link {
+            text-decoration: none;
+        }
+    </style>
+
+    <li>{{ paginationLink(p, 1, '<<') }}</li>
+
+    {% if page > 1 %}
+    <li>{{ paginationLink(p, page - 1) }}</li>
+    {% endif %}
+
+    <li>{{ page }}</li>
+
+    {% if page < pageCount %}
+    <li>{{ paginationLink(p, page + 1) }}</li>
+    {% endif %}
+
+    <li>{{ paginationLink(p, pageCount, '>>') }}</li>
+</ul>
+{% endif %}
+
+{% endmacro %}
+
+{% macro paginationLink(p, page, text) %}
+    <a class="page-link" href="{{ p.createUrl(page - 1) }}">{{ text | default(page) }}</a>
+{% endmacro %}

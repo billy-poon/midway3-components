@@ -9,9 +9,11 @@ export class CategoryCommand implements ICommand {
     @Inject()
     ctrl: CategoryController
 
-    exec() {
+    exec(ctx: unknown, keyword: string) {
         const query = Category.find((q, t, op) => {
-            q.where(op.like(t.name, '%C%'))
+            if (keyword) {
+                q.where(op.like(t.name, `%${keyword}%`))
+            }
         })
 
         return ActiveDataProvider.create(query)
@@ -22,7 +24,10 @@ export class CategoryCommand implements ICommand {
         @Positional('id')
         category_id: number
     ) {
-        const result = await Category.findOne({ category_id }, true)
+        // const result = await Category.findOne({ category_id }, true)
+        const result = await Category.find()
+            .where({ category_id })
+            .one()
         return result
     }
 

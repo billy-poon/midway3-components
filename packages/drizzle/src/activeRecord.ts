@@ -1,24 +1,11 @@
 import { configure } from '@midway3-components/core'
-import { and, Column, eq, SQL } from 'drizzle-orm'
-import { ActiveQuery } from './activeQuery'
+import { and, Column, eq, getTableColumns } from 'drizzle-orm'
+import { ActiveQuery, Condition } from './activeQuery'
 import { getDataSource } from './dataSourceManager'
 import { OnLoad } from './decorator/load'
-import { op, Operations } from './drizzle'
-import { ColumnKeyOf, ColumnsOf, Drizzle, PrimaryKeyOf, RowOf, Table } from './interface'
-import { isDrizzleColumn, isMySQL, isMySQLResult, isPostgres, isPostgresResult, isSQLite, isSQLiteResult } from './utils'
-
-function getColumns<T extends Table>(table: T) {
-    return Object.entries(table)
-        .reduce(
-            (res, [k, v]) => {
-                if (isDrizzleColumn(v)) {
-                    res[k as ColumnKeyOf<T>] = v as any
-                }
-                return res
-            },
-            {} as ColumnsOf<T>
-        )
-}
+import { isMySQL, isMySQLResult, isPostgres, isPostgresResult, isSQLite, isSQLiteResult } from './dialects'
+import { Drizzle, op, Operations } from './drizzle'
+import { ActiveRecordOf, ColumnKeyOf, ColumnsOf, PrimaryKeyValueOf, RowOf, Table } from './types'
 
 type TableOf<T> = T extends ActiveRecordConstructor<infer P>
     ? P : never
@@ -30,12 +17,11 @@ type BuildQuery<T extends ActiveRecordConstructor> = (
     op: Operations
 ) => void
 
-type Condition<T extends ActiveRecordConstructor> =
-    | SQL
+type ActiveCondition<T extends ActiveRecordConstructor> =
     | BuildQuery<T>
-    | Partial<RowOf<TableOf<T>>>
+    | Condition<InstanceType<T>>
 
-function normalizeCondition<T extends ActiveRecordConstructor>(val: Condition<T>): BuildQuery<T> {
+function normalizeCondition<T extends ActiveRecordConstructor>(val: ActiveCondition<T>): BuildQuery<T> {
     return typeof val === 'function'
         ? val
         : q => q.where(val as any)
@@ -50,14 +36,13 @@ export interface ActiveRecordConstructor<T extends Table = any> {
 
     find<C extends ActiveRecordConstructor>(this: C, build?: BuildQuery<C>): ActiveQuery<InstanceType<C>>
 
-    findOne<C extends ActiveRecordConstructor>(this: C, condition?: Condition<C>): Promise<InstanceType<C> | null>
-    findOne<C extends ActiveRecordConstructor>(this: C, condition: Condition<C> | undefined | null, required: true): Promise<InstanceType<C>>
+    findOne<C extends ActiveRecordConstructor>(this: C, condition?: ActiveCondition<C>): Promise<InstanceType<C> | null>
+    findOne<C extends ActiveRecordConstructor>(this: C, condition: ActiveCondition<C> | undefined | null, required: true): Promise<InstanceType<C>>
 
-    findAll<C extends ActiveRecordConstructor>(this: C, condition?: Condition<C>): Promise<InstanceType<C>[]>
+    findAll<C extends ActiveRecordConstructor>(this: C, condition?: ActiveCondition<C>): Promise<InstanceType<C>[]>
 }
 
-export interface AbstractActiveRecord<T extends Table> {
-    readonly $row?: RowOf<T>
+export interface AbstractActiveRecord<T extends Table> extends ActiveRecordOf<T> {
     constructor: ActiveRecordConstructor<T>
 }
 
@@ -79,7 +64,7 @@ export class AbstractActiveRecord<T extends Table> {
     static columns<K extends Table>(
         this: ActiveRecordConstructor<K>
     ) {
-        return getColumns(this.table())
+        return getTableColumns(this.table())
     }
 
     static find<K extends Table>(
@@ -98,7 +83,7 @@ export class AbstractActiveRecord<T extends Table> {
 
     static async findOne<K extends Table>(
         this: ActiveRecordConstructor<K>,
-        condition?: Condition<typeof this>,
+        condition?: ActiveCondition<typeof this>,
         required?: boolean
     ) {
         const build = condition != null
@@ -115,7 +100,7 @@ export class AbstractActiveRecord<T extends Table> {
 
     static async findAll<K extends Table>(
         this: ActiveRecordConstructor<K>,
-        condition?: Condition<typeof this>
+        condition?: ActiveCondition<typeof this>
     ) {
         const build = condition != null
             ? normalizeCondition(condition)
@@ -125,7 +110,7 @@ export class AbstractActiveRecord<T extends Table> {
         return result
     }
 
-    pk(validate = true): PrimaryKeyOf<T> {
+    pk(validate = true): PrimaryKeyValueOf<T> {
         const columns: Record<string, Column> = this.constructor.columns()
 
         const result = Object.entries(columns)
@@ -137,7 +122,7 @@ export class AbstractActiveRecord<T extends Table> {
                     return res
                 },
                 {} as Record<string, unknown>
-            ) as PrimaryKeyOf<T>
+            ) as PrimaryKeyValueOf<T>
 
         if (validate) {
             const items = Object.entries(result)

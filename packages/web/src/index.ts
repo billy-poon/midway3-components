@@ -1,3 +1,4 @@
+export * from './decorator/render'
 export * from './interface'
 export * from './middleware/restful.middleware'
 export * from './service/serializerService'

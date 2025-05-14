@@ -1,15 +1,11 @@
-import { Controller, Get, Redirect } from '@midwayjs/core'
+import { Render } from '@midway3-components/web'
+import { Controller, Get } from '@midwayjs/core'
 
 @Controller('/')
 export class HomeController {
-  // @Get('/')
-  // async home(): Promise<string> {
-  //   return 'Hello Midwayjs!';
-  // }
-
-  @Get('/')
-  @Redirect('/api/country')
-  async indexAction() {
-
-  }
+    @Get('/')
+    @Render()
+    async indexAction(): Promise<string> {
+      return 'Hello Midwayjs!';
+    }
 }

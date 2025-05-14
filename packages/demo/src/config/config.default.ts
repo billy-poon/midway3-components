@@ -5,7 +5,7 @@ import { Logger } from 'drizzle-orm'
 import { resolve } from 'path'
 
 config({
-    path: ['.env', `.env-${process.env.NODE_ENV}`]
+    path: ['.env', `.env-${process.env.NODE_ENV}`, '.env-local']
 })
 
 const { DB_USER, DB_PASS } = process.env
@@ -26,6 +26,12 @@ export default {
     keys: '1743411033712_8114',
     koa: {
         port: 7001,
+    },
+    view: {
+        defaultExtension: '.njk',
+        mapping: {
+            '.njk': 'nunjucks',
+        },
     },
     data: {
         serializer: {

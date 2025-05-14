@@ -2,7 +2,8 @@ import { Class, DecoratorKey, getSuperClass } from '@midway3-components/core'
 import { getClassMetadata, listPropertyDataFromClass, saveClassMetadata, savePropertyDataToClass } from '@midwayjs/core'
 import { Transform } from 'class-transformer'
 import { Column as DrizzleColumn, SQL, Table } from 'drizzle-orm'
-import { Drizzle, JoinType } from '../interface'
+import { Drizzle } from '../drizzle'
+import { JoinType } from '../query'
 import { OnLoad, OnLoadCallback } from './load'
 
 type From = Table

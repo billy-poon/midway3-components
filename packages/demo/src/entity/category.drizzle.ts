@@ -21,6 +21,11 @@ export class Category extends CreateActiveRecord(categoryTable) {
         return super.columns()
     }
 
+    static async getById(category_id: number) {
+        const result = await Category.findOne({ category_id })
+        return result
+    }
+
     protected async beforeInsert(): Promise<boolean> {
         if (await super.beforeInsert()) {
             if (isSQLite(Category.db())) {

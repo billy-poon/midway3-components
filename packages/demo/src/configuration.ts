@@ -7,6 +7,7 @@ import * as koa from '@midwayjs/koa'
 import * as sequelize from '@midwayjs/sequelize'
 import * as typeorm from '@midwayjs/typeorm'
 import * as validate from '@midwayjs/validate'
+import * as nunjucks from '@midwayjs/view-nunjucks'
 import { join } from 'path'
 // import { DefaultErrorFilter } from './filter/default.filter';
 // import { NotFoundFilter } from './filter/notfound.filter';
@@ -22,6 +23,7 @@ import { registerSerializerService } from './service/serializer.service'
         typeorm,
         drizzle,
         sequelize,
+        nunjucks,
         {
             component: info,
             enabledEnvironment: ['local'],
@@ -40,7 +42,10 @@ export class MainConfiguration implements ILifeCycle {
         this.app.useMiddleware([
             ReportMiddleware,
             core.ContextMiddleware,
-            web.RESTfulMiddleware,
+            {
+                middleware: web.RESTfulMiddleware,
+                options: { match: /^\/api\// },
+            },
         ])
         // add filter
         // this.app.useFilter([NotFoundFilter, DefaultErrorFilter]);

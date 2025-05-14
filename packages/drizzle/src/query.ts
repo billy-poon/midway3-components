@@ -1,10 +1,41 @@
-import { isTable, SelectedFields, SQL, Table } from 'drizzle-orm'
+import { isTable, Placeholder, SQL, SQLWrapper, Table } from 'drizzle-orm'
 import { getDataSource } from './dataSourceManager'
 import { EntityClass, getEntityDefinition } from './decorator/entity'
-import { Drizzle, Query } from './interface'
+import type { Drizzle, Executable } from './drizzle'
+import { SelectedFields } from './types'
 import { isDrizzleColumn } from './utils'
 
-export function entityQuery<T extends object>(clz: EntityClass<T>, dataSource?: Drizzle | string) {
+export type JoinType = 'left' | 'right' | 'inner'
+
+export interface Query<T = unknown> extends Executable<T[]> {
+    leftJoin: (table: Table | SQL, on: SQL) => unknown
+    rightJoin: (table: Table | SQL, on: SQL) => unknown
+    innerJoin: (table: Table | SQL, on: SQL) => unknown
+
+    where(where?: SQL): any
+    orderBy(...items: SQL[]): any
+
+    offset(offset: number | Placeholder): any
+    limit(limit: number | Placeholder): any
+}
+
+export type QueryConfig = {
+    fields: SelectedFields
+
+    where?: SQL
+    limit?: number | Placeholder
+    offset?: number | Placeholder
+    orderBy?: SQLWrapper[]
+}
+
+export type QuerySession = {
+    count(sql: SQL): Promise<number>
+}
+
+export type QueryResultOf<T extends Query> = T extends Query<infer P>
+    ? P : never
+
+export function createQuery<T extends object>(clz: EntityClass<T>, dataSource?: Drizzle | string) {
     const { from, options, columns } = getEntityDefinition(clz)
 
     dataSource = dataSource ?? options?.dataSource
@@ -12,7 +43,7 @@ export function entityQuery<T extends object>(clz: EntityClass<T>, dataSource?: 
         ? dataSource : getDataSource(dataSource)
 
     const table: Table | undefined = isTable(from) ? from : undefined
-    const fields = columns.reduce<SelectedFields<any, any>>(
+    const fields = columns.reduce<SelectedFields>(
         (res, x) => {
             const { propertyKey: key } = x
             let column = x.column

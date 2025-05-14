@@ -1,5 +1,5 @@
 import { createCustomPropertyDecorator, MidwayDecoratorService } from '@midwayjs/core'
-import { Drizzle } from '../interface'
+import { Drizzle } from '../drizzle'
 
 const key = '@midway3-components/drizzle:decorator:inject-drizzle'
 

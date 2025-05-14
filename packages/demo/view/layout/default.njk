@@ -1,0 +1,7 @@
+{% include "./head.njk" %}
+
+{% block content %}
+    <h1>{{ content | default('Hello, World!') }}</h1>
+{% endblock %}
+
+{% include "./foot.njk" %}
