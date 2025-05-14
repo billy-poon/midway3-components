@@ -1,7 +1,7 @@
 import { Awaitable, identity, isPrimitive } from '@midway3-components/core'
 import { isDataProvider, Sort } from '@midway3-components/core/dist/data'
 import { Context, createCustomMethodDecorator, getCurrentApplicationContext, getCurrentMainApp, getProviderUUId, IObjectDefinition, MidwayDecoratorService, REQUEST_OBJ_CTX_KEY, RequestMethod } from '@midwayjs/core'
-import { RenderOptions as _RenderOptions, ViewManager } from '@midwayjs/view'
+import type { RenderOptions as _RenderOptions } from '@midwayjs/view'
 import { AssertionError } from 'assert'
 import { dirname, relative, resolve } from 'path'
 import { Pagination } from '../data/pagination'
@@ -137,10 +137,11 @@ async function getView(ctx: RenderContext) {
 }
 
 async function existsView(name: string) {
-    const service = await getCurrentApplicationContext()
-        .getAsync(ViewManager)
-
     try {
+        const { ViewManager } = await import('@midwayjs/view')
+        const service = await getCurrentApplicationContext()
+            .getAsync(ViewManager)
+
         await service.resolve(name)
         return true
     } catch (err) {
