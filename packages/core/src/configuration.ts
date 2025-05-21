@@ -1,5 +1,6 @@
-import { Configuration } from '@midwayjs/core'
+import { Configuration, ILifeCycle, IMidwayContainer, MidwayDecoratorService } from '@midwayjs/core'
 import defaultConfig from './config/config.default'
+import { registerActionHandler } from './decorator/action'
 
 @Configuration({
     importConfigs: [
@@ -8,6 +9,9 @@ import defaultConfig from './config/config.default'
         }
     ]
 })
-export class ComponentConfiguration {
-
+export class ComponentConfiguration implements ILifeCycle {
+    async onReady(container: IMidwayContainer): Promise<void> {
+        const decoratorService = await container.getAsync(MidwayDecoratorService)
+        registerActionHandler(decoratorService)
+    }
 }

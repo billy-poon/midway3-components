@@ -1,5 +1,5 @@
 import { Context, IMiddleware, Middleware, NextFunction } from '@midwayjs/core'
-import { SerializerService } from '../service/serializerService'
+import { SerializeService } from '../service/serializeService'
 import { isStream } from '../utils'
 
 type _Middleware = IMiddleware<Context, NextFunction>
@@ -60,6 +60,6 @@ export class RESTfulMiddleware implements _Middleware {
 
     async resolveSerializer(ctx: Context) {
         return ctx.requestContext
-            .getAsync(SerializerService)
+            .getAsync(SerializeService)
     }
 }

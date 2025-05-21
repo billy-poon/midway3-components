@@ -180,7 +180,7 @@ export class AbstractActiveRecord<T extends Table> {
     }
 
     configure(data: Partial<RowOf<T>>) {
-        return configure(this, data as Partial<this>)
+        return configure(this, data as any)
     }
 
     attributes() {

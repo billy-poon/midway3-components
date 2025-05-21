@@ -1,10 +1,6 @@
 {% extends "../layout/default.njk" %}
 
 {% block content %}
-    <!-- the country/index view -->
     {% from "../component/data-table.njk" import dataTable %}
     {{ dataTable(data) }}
-
-    {% from "../component/pagination.njk" import pagination %}
-    {{ pagination($pagination) }}
 {% endblock %}

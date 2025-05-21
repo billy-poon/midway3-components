@@ -1,9 +1,9 @@
 import { BaseDataProvider } from '@midway3-components/core/dist/data'
-import { SerializerService as _SerializerService } from '@midway3-components/web'
+import { SerializeService as _SerializeService } from '@midway3-components/web'
 import { getProviderUUId, IMidwayContainer, Provide, providerWrapper } from '@midwayjs/core'
 
 @Provide()
-export class SerializerService extends _SerializerService {
+export class SerializeService extends _SerializeService {
     protected serializeDataProvider(dataProvider: BaseDataProvider): Promise<unknown> {
         const { sort = '', pagination = '' } = this.getParams()
         if (sort === '0') {
@@ -18,12 +18,12 @@ export class SerializerService extends _SerializerService {
 }
 
 export function resolveSerializerService(container: IMidwayContainer, args?: any) {
-    return container.getAsync(SerializerService, args)
+    return container.getAsync(SerializeService, args)
 }
 
 
-export function registerSerializerService() {
-    const uuid = getProviderUUId(_SerializerService)
+export function registerSerializeService() {
+    const uuid = getProviderUUId(_SerializeService)
     providerWrapper([
         {
             id: uuid,

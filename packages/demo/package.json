@@ -45,7 +45,7 @@
     "dev:cli": "cross-env NODE_ENV=local mwtsc --watch --run ./bootstrap-cli.js",
     "start": "NODE_ENV=production node ./bootstrap.js",
     "dev": "rm -rf ./dist && cross-env NODE_ENV=local mwtsc --watch --run @midwayjs/mock/app.js",
-    "test": "cross-env NODE_ENV=unittest jest",
+    "test": "cross-env NODE_ENV=unittest jest --detectOpenHandles",
     "cov": "jest --coverage",
     "lint": "mwts check",
     "lint:fix": "mwts fix",

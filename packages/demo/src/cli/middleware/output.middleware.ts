@@ -1,5 +1,5 @@
 import { Application, Context, IMiddleware } from '@midway3-components/cli'
-import { SerializerService } from '@midway3-components/core'
+import { SerializeService } from '@midway3-components/core'
 import { isDataProvider, Pagination, Sort } from '@midway3-components/core/dist/data'
 import { FunctionMiddleware, Middleware, NextFunction } from '@midwayjs/core'
 
@@ -17,7 +17,7 @@ export class OutputMiddleware implements IMiddleware {
             let result = ctx.body ?? ret
             if (isDataProvider(result)) {
                 const service = await ctx.requestContext
-                    .getAsync(SerializerService)
+                    .getAsync(SerializeService)
 
                 const {
                     data,

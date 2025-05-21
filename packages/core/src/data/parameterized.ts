@@ -5,7 +5,7 @@ export abstract class Parameterized {
     params?: RequestParameters
 
     configure(options: Partial<this>) {
-        return configure(this, options)
+        return configure(this, options as any)
     }
 
     getStrValue(name: string, defaultValue = '') {

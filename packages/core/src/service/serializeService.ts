@@ -7,7 +7,7 @@ import { ConfigurationOptions, ParametersFactory, RequestParameters, SerializerO
 import { configure, isPrimitive } from '../utils'
 
 @Provide()
-export class SerializerService implements SerializerOptions {
+export class SerializeService implements SerializerOptions {
     @Config('data')
     configOptions: ConfigurationOptions['data']
 
@@ -17,7 +17,7 @@ export class SerializerService implements SerializerOptions {
     paramsFactory?: ParametersFactory
 
     @Init()
-    async init(this: SerializerService) {
+    async init(this: SerializeService) {
         configure(this, this.configOptions.serializer)
         if (typeof this.paramsFactory === 'function') {
             this._params = await this.paramsFactory()

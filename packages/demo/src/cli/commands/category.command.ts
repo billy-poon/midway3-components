@@ -1,7 +1,7 @@
 import { Command, ICommand, Positional, SubCommand } from '@midway3-components/cli'
 import { ActiveDataProvider } from '@midway3-components/core'
 import { Inject } from '@midwayjs/core'
-import { CategoryController } from '../../controller/api/category.controller'
+import { CategoryController } from '../../controller/api/category/category.controller'
 import { Category } from '../../entity/category.drizzle'
 
 @Command()

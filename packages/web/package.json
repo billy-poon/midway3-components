@@ -26,6 +26,7 @@
   "devDependencies": {
     "@midway3-components/core": "workspace:^",
     "@midwayjs/core": "3",
+    "@midwayjs/koa": "^3.12.0",
     "@midwayjs/view": "^3.20.5",
     "@types/node": "^22.13.14",
     "typescript": "^5.8.2"

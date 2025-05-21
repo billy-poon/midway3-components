@@ -2,10 +2,9 @@ import { Awaitable, identity, isPrimitive } from '@midway3-components/core'
 import { isDataProvider, Sort } from '@midway3-components/core/dist/data'
 import { Context, createCustomMethodDecorator, getCurrentApplicationContext, getCurrentMainApp, getProviderUUId, IObjectDefinition, MidwayDecoratorService, REQUEST_OBJ_CTX_KEY, RequestMethod } from '@midwayjs/core'
 import type { RenderOptions as _RenderOptions } from '@midwayjs/view'
-import { AssertionError } from 'assert'
-import { dirname, relative, resolve } from 'path'
+import { basename, dirname, relative, resolve } from 'path'
 import { Pagination } from '../data/pagination'
-import { SerializerService } from '../service/serializerService'
+import { SerializeService } from '../service/serializeService'
 
 const key = '@midway3-components/web:decorator:render'
 
@@ -111,47 +110,51 @@ async function getView(ctx: RenderContext) {
     const {
         controller: ctrl,
         actionMethod: action,
-        context,
+        // context,
         definition
     } = ctx
 
-    const { path } = context
-    if (path != null) {
-        let view = path
-        if (view.endsWith('/')) {
-            view += 'index'
-        }
-        if (view.startsWith('/')) {
-            view = view.replace(/^\/+/, '')
-        }
-        if (await existsView(view)) {
-            return view
-        }
+    // const { path } = context
+    // if (path != null) {
+    //     let view = path
+    //     if (view.endsWith('/')) {
+    //         view += 'index'
+    //     }
+    //     if (view.startsWith('/')) {
+    //         view = view.replace(/^\/+/, '')
+    //     }
+    //     if (await existsView(view)) {
+    //         return view
+    //     }
+    // }
+
+    let ctrlDir = getCtrlDir(definition)
+    const ctrlName = identity(ctrl.constructor.name, 'Controller')
+    if (ctrlDir != null && basename(ctrlDir) === ctrlName) {
+        ctrlDir = dirname(ctrlDir)
     }
 
-    const ctrlDir = getCtrlDir(definition)
-    const ctrlName = identity(ctrl.constructor.name, 'Controller')
     const actionName = identity(action, 'Action')
 
     return [ctrlDir, ctrlName, actionName].filter(Boolean).join('/')
 }
 
-async function existsView(name: string) {
-    try {
-        const { ViewManager } = await import('@midwayjs/view')
-        const service = await getCurrentApplicationContext()
-            .getAsync(ViewManager)
+// async function existsView(name: string) {
+//     try {
+//         const { ViewManager } = await import('@midwayjs/view')
+//         const service = await getCurrentApplicationContext()
+//             .getAsync(ViewManager)
 
-        await service.resolve(name)
-        return true
-    } catch (err) {
-        if (err instanceof AssertionError) {
-            return false
-        }
+//         await service.resolve(name)
+//         return true
+//     } catch (err) {
+//         if (err instanceof AssertionError) {
+//             return false
+//         }
 
-        throw err
-    }
-}
+//         throw err
+//     }
+// }
 
 function getCtrlDir(ctrlDef: IObjectDefinition) {
     const ctrlPath = resolve(ctrlDef.srcPath)
@@ -175,7 +178,7 @@ async function toLocals(value: unknown, ctx: Context): Promise<Locals> {
         return { data: value }
     } else if (isDataProvider(value)) {
         const serializer = await ctx.requestContext
-            .getAsync(SerializerService)
+            .getAsync(SerializeService)
         const result = await serializer.serialize(value) as any
 
         const $models = await value.getModels()
@@ -189,5 +192,5 @@ async function toLocals(value: unknown, ctx: Context): Promise<Locals> {
             $pagination: $pagination as any
         }
     }
-    return { ...value }
+    return { value }
 }

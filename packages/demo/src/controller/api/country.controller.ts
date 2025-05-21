@@ -1,39 +1,15 @@
-import { ActiveDataProvider } from '@midway3-components/core'
-import { ActiveQuery } from '@midway3-components/core/dist/sequelize'
-import { Controller, Get, Param, Query } from '@midwayjs/core'
-import { Op } from 'sequelize'
-import { Country } from '../../entity/country.sequelize'
+import { Action } from '@midway3-components/core'
+import { Controller, Get } from '@midwayjs/core'
+import { IndexAction } from '../country/index.action'
+import { ViewAction } from '../country/view.action'
 
 @Controller('/api/country')
 export class CountryController {
     @Get('/')
-    async indexAction(
-        @Query('q')
-        keyword: string = ''
-    ) {
-        const query = ActiveQuery
-            .create(Country)
-
-        if (keyword !== '') {
-            query.where({
-                country: {
-                    [Op.like]: `%${keyword}%`
-                }
-            })
-        }
-
-        return ActiveDataProvider.create(query)
-    }
+    @Action(IndexAction)
+    async indexAction() { }
 
     @Get('/:id')
-    async viewAction(
-        @Param('id')
-        country_id: number
-    ) {
-        return Country.findOne({
-            where: {
-                country_id
-            }
-        })
-    }
+    @Action(ViewAction)
+    async viewAction() { }
 }

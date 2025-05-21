@@ -1,27 +1,28 @@
-import { ActiveDataProvider, SerializerService } from '@midway3-components/core'
-import { Controller, Get, Inject, Post } from '@midwayjs/core'
-import { like } from 'drizzle-orm'
-import { Category } from '../../entity/category.drizzle'
+import { IAction, SerializeService } from '@midway3-components/core'
+import { AbstractModel } from '@midway3-components/core/dist/data'
+import { Body, Inject, Provide } from '@midwayjs/core'
+import { Rule, RuleType } from '@midwayjs/validate'
+import { Category } from '../../../entity/category.drizzle'
 
-@Controller('/api/category')
-export class CategoryController {
+// extends from `AbstractModel` to store validation error
+class CreateDTO extends AbstractModel {
+    @Rule(RuleType.required().label('Name'))
+    name: string
+}
+
+@Provide()
+export class CudAction implements IAction {
     @Inject()
-    serializer: SerializerService
+    serializer: SerializeService
 
-    @Get('/')
-    async indexAction() {
-        const query = Category.find((q, t) => {
-            q.where(like(t.name, '%C%'))
-        })
-        return ActiveDataProvider.create(query)
-    }
-
-    @Post('/cud')
-    async cudAction() {
+    async run(
+        @Body()
+        body: CreateDTO
+    ) {
         let ret: unknown
 
         const model = new Category()
-        model.name = 'Custom'
+        model.configure(body)
         ret = await model.save()
         const created = {
             model: await this.serializer.serialize(model),

@@ -1,10 +1,11 @@
 export * from './data/activeDataProvider'
 export * from './data/arrayDataProvider'
+export * from './decorator/action'
 export * from './decorator/field'
 export * from './decorator/sortable'
 export * from './interface'
 export * from './middleware/context.middleware'
-export * from './service/serializerService'
+export * from './service/serializeService'
 export * from './utils'
 
 export { ComponentConfiguration as Configuration } from './configuration'

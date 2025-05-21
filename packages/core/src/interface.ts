@@ -34,6 +34,12 @@ export interface ConfigurationOptions {
 }
 
 export type Class<T = any, A extends [] = any> = new (...args: A) => T
+export type AbstractClass<T = any, A extends [] = any> = abstract new (...args: A) => T
+
+export type PartialData<T> = {
+    [K in keyof T as T[K] extends Function ? never : K]?: T[K]
+}
+
 
 // https://github.com/vuejs/core/blob/a23fb59e83c8b65b27eaa21964c8baa217ab0573/packages/runtime-core/src/apiInject.ts#L7
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unused-vars

@@ -3,6 +3,7 @@ import { IViewEngine } from '@midwayjs/view'
 export { }
 
 interface Request {
+    body?: unknown
     method?: string
 }
 
