@@ -1,20 +1,20 @@
 import { Context, createCustomMethodDecorator, MidwayDecoratorService, REQUEST_OBJ_CTX_KEY } from '@midwayjs/core'
 import { isModel } from '../data'
-import { Awaitable, Class } from '../interface'
+import { Class } from '../interface'
 
 export interface IAction<CTX extends Context = any, RES = any> {
-    run(ctx: CTX): Awaitable<RES>
+    run(ctx: CTX, ...args: any): Promise<RES>
 }
 
 type Meta = {
-    clz: Class
-    args?: unknown[]
+    actionClz: Class
+    constructArgs?: unknown[]
 }
 
 const key = '@midway3-components/core:decorator:action'
 
-export function Action<T extends Class<IAction>>(clz: T, args?: ConstructorParameters<T>): MethodDecorator {
-    const meta: Meta = { clz, args }
+export function Action<T extends Class<IAction>>(actionClz: T, constructArgs?: ConstructorParameters<T>): MethodDecorator {
+    const meta: Meta = { actionClz, constructArgs }
     return createCustomMethodDecorator(key, meta)
 }
 
@@ -26,16 +26,18 @@ export function registerActionHandler(decoratorService: MidwayDecoratorService) 
                 throw new Error('Failed to resolve request context.')
             }
 
-            const { clz, args } = opt.metadata as Meta
-            const action = await ctx.requestContext.getAsync<IAction>(clz, args)
+            const { actionClz, constructArgs } = opt.metadata as Meta
+            const action = await ctx.requestContext.getAsync<IAction>(actionClz, constructArgs)
 
             try {
-                const result = await action.run(ctx)
-                p.args = [ctx, result, ...p.args]
+                const args = p.args[0] === ctx
+                    ? p.args.slice(1)
+                    : p.args
 
-                const nextVal = await p.proceed?.(...p.args)
-                return nextVal !== undefined
-                    ? nextVal : result
+                const result = await action.run(ctx, ...args)
+                const nextVal = await p.proceed?.(ctx, result, ...args)
+
+                return nextVal !== undefined ? nextVal : result
             } catch (err) {
                 const { cause } = err ?? {}
                 if (isJoiValidationError(cause)) {

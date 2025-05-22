@@ -7,7 +7,7 @@ import { Country } from '../../entity/country.sequelize'
 
 @Provide()
 export class IndexAction implements IAction {
-    run(
+    async run(
         ctx: Context,
         @Query('q')
         keyword = ''
