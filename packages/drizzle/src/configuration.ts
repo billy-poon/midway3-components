@@ -1,9 +1,13 @@
+import * as core from '@midway3-components/core'
 import { Configuration, ILifeCycle, IMidwayContainer, Init, Inject, MidwayDecoratorService } from '@midwayjs/core'
 import defaultConfig from './config/config.default'
 import { DrizzleDataSourceManager } from './dataSourceManager'
 import { registerInjectDrizzleHandler } from './decorator/drizzle'
 
 @Configuration({
+    imports: [
+        core
+    ],
     importConfigs: [
         {
             default: defaultConfig

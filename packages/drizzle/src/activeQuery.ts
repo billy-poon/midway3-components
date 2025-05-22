@@ -4,7 +4,7 @@ import { isClass } from '@midwayjs/core/dist/util/types'
 import { plainToInstance } from 'class-transformer'
 import { and, asc, desc, eq, isNull, isSQLWrapper, SQL, sql } from 'drizzle-orm'
 import { EntityClass } from './decorator/entity'
-import { triggerOnLoad } from './decorator/load'
+import { triggerOnLoad } from './decorator/onLoad'
 import { createQuery, Query, QueryConfig, QueryResultOf, QuerySession } from './query'
 import { ActiveRecordOf, RowOf, SelectedFields } from './types'
 import { isDrizzleColumn } from './utils'
@@ -178,15 +178,14 @@ function patchQuery<T extends Executable>(query: T, modelClass: Class): T {
         const execute = async (...args: any) => {
             const result = await original.call(query, ...args)
             if (Array.isArray(result) && result.length > 0) {
-                const models = plainToInstance(modelClass, result)
+                const items = plainToInstance(modelClass, result)
+                    .map((entity, i) => ({
+                        entity,
+                        data: result[i]
+                    }))
 
-                const entities = models.map((entry, i) => ({
-                    entry,
-                    data: result[i]
-                }))
-                await triggerOnLoad(modelClass, entities)
-
-                return models
+                const array = await triggerOnLoad(modelClass, items)
+                return (array ?? items).map(x => x.entity)
             }
 
             return result

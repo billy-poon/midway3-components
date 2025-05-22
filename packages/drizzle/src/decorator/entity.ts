@@ -4,7 +4,7 @@ import { Transform } from 'class-transformer'
 import { Column as DrizzleColumn, SQL, Table } from 'drizzle-orm'
 import { Drizzle } from '../drizzle'
 import { JoinType } from '../query'
-import { OnLoad, OnLoadCallback } from './load'
+import { OnLoad, OnLoadCallback } from './onLoad'
 
 type From = Table
 type Join = {
