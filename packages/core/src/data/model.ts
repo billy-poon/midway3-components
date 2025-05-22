@@ -171,8 +171,8 @@ export class ProxyModel extends AbstractModel {
 
 const classType = Symbol('@midway3-components/core:model')
 
-interface ModelConstructor {
-    new (args: any): AbstractModel
+export interface ModelConstructor {
+    new (args?: any): AbstractModel
 }
 
 export function ModelClass<T extends Class>(superClz: T): ModelConstructor & T
