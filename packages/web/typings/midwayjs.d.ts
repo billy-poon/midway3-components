@@ -20,5 +20,6 @@ declare module '@midwayjs/core/dist/interface' {
 
         status?: number
         body?: unknown
+        type?: string
     }
 }

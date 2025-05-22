@@ -20,6 +20,10 @@ function jsonSupported(val: unknown) {
     return true
 }
 
+const JsonNull = {
+    toJSON: () => null
+}
+
 @Middleware()
 export class RESTfulMiddleware implements _Middleware {
     match?: _Middleware['match']
@@ -47,8 +51,17 @@ export class RESTfulMiddleware implements _Middleware {
                 const serializer = await this.resolveSerializer(ctx)
 
                 const result = await serializer.serialize(body)
-                if (result !== undefined && pretty) {
-                    return JSON.stringify(result, null, space)
+                if (result !== undefined) {
+                    if (ctx.status === 204) {
+                        ctx.status = 200
+                    }
+
+                    if (pretty) {
+                        ctx.type = 'json'
+                        return JSON.stringify(result, null, space)
+                    } else if (result == null) {
+                        return JsonNull
+                    }
                 }
 
                 return result
