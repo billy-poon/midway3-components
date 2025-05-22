@@ -1,6 +1,6 @@
 {
   "name": "@midway3-components/web",
-  "version": "0.1.5",
+  "version": "0.1.8",
   "description": "",
   "main": "dist/index.js",
   "typings": "index.d.ts",
