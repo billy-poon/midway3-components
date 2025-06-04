@@ -42,16 +42,19 @@ export class BaseRESTfulController<T extends object, C extends Context = any> im
         return {}
     }
 
-    async indexAction(ctx: C): Promise<DataProviderInterface<T> | T[]> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async indexAction(ctx: C, ...args: any): Promise<DataProviderInterface<T> | T[]> {
         const query = this.store.query()
         return ActiveDataProvider.create(query)
     }
 
-    async viewAction(ctx: C) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async viewAction(ctx: C, ...args: any) {
         return this.resolveOne(ctx, 'view')
     }
 
-    async createAction(ctx: C) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async createAction(ctx: C, ...args: any) {
         await this.assertMutable(ctx, 'create')
 
         const store = this.store
@@ -67,7 +70,8 @@ export class BaseRESTfulController<T extends object, C extends Context = any> im
         return result
     }
 
-    async updateAction(ctx: C) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async updateAction(ctx: C, ...args: any) {
         await this.assertMutable(ctx, 'update')
 
         const model = await this.resolveOne(ctx, 'update')
@@ -81,7 +85,8 @@ export class BaseRESTfulController<T extends object, C extends Context = any> im
         return result
     }
 
-    async deleteAction(ctx: C) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async deleteAction(ctx: C, ...args: any) {
         await this.assertMutable(ctx, 'delete')
 
         const model = await this.resolveOne(ctx, 'delete')
@@ -90,12 +95,14 @@ export class BaseRESTfulController<T extends object, C extends Context = any> im
         ctx.status = HttpStatus.NO_CONTENT
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected assertMutable(ctx: C, scenario: Scenario): Awaitable<void> {
         if (this.getOptions().readonly) {
             throw new ForbiddenError('This path is readonly: ' + ctx.path)
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected async resolveOne(ctx: C, scenario: Scenario) {
         const paramName = this.paramName()
         const { [paramName]: id } = ctx.params ?? {}

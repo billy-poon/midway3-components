@@ -1,6 +1,5 @@
 import { ArrayDataProvider, configure, DataStore, QueryInterface } from '@midway3-components/core'
 import { RESTful, RESTfulController, RESTfulFrom } from '@midway3-components/web'
-import { getCurrentMainApp } from '@midwayjs/core'
 import { Rule, RuleType } from '@midwayjs/validate'
 
 interface Person {
@@ -67,9 +66,6 @@ const peopleStore = new PeopleStore()
 @RESTful('/rest/people')
 export class PeopleController extends RESTfulController(peopleStore, { editBodyClz: EditForm }) {
     async indexAction() {
-        // @ts-expect-error
-        const app = getCurrentMainApp()
-
         const { items } = peopleStore
         return new ArrayDataProvider(items)
     }
