@@ -1,6 +1,6 @@
 {
   "name": "@midway3-components/drizzle",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "",
   "main": "dist/index.js",
   "typings": "index.d.ts",
