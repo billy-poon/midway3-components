@@ -2,8 +2,8 @@ import { Attributes, FindOptions, Model, WhereOptions } from 'sequelize'
 import { QueryInterface } from '../data/activeDataProvider'
 import { getSortableOptions, SortableOptions } from '../decorator/sortable'
 import { deepClone } from '../utils'
+import { ModelConstructor } from './types'
 
-type ModelConstructor<T> = (new (...args: any) => T) & typeof Model
 type Arguments<T> = T extends (...args: infer P) => any ? P : never
 
 export class ActiveQuery<T extends Model> implements QueryInterface<T> {

@@ -5,14 +5,11 @@ import { DrizzleDataSourceManager } from './dataSourceManager'
 import { registerInjectDrizzleHandler } from './decorator/drizzle'
 
 @Configuration({
-    imports: [
-        core
-    ],
-    importConfigs: [
-        {
-            default: defaultConfig
-        }
-    ]
+    namespace: '@midway3-components/drizzle',
+    imports: [core],
+    importConfigs: [{
+        default: defaultConfig
+    }]
 })
 export class ComponentConfiguration implements ILifeCycle {
     @Inject()

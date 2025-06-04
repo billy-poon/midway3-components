@@ -16,6 +16,8 @@ declare module '@midwayjs/core/dist/interface' {
         origin?: string
         query?: Record<string, unknown>
 
+        params?: Record<string, unknown>
+
         set?: (header: string, value: unknown) => void
 
         status?: number

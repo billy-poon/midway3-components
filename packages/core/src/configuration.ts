@@ -3,11 +3,10 @@ import defaultConfig from './config/config.default'
 import { registerActionHandler } from './decorator/action'
 
 @Configuration({
-    importConfigs: [
-        {
-            default: defaultConfig
-        }
-    ]
+    namespace: '@midway3-components/core',
+    importConfigs: [{
+        default: defaultConfig
+    }]
 })
 export class ComponentConfiguration implements ILifeCycle {
     async onReady(container: IMidwayContainer): Promise<void> {

@@ -1,12 +1,11 @@
 import { Class, DecoratorKey, getSuperClass } from '@midway3-components/core'
 import { getClassMetadata, listPropertyDataFromClass, saveClassMetadata, savePropertyDataToClass } from '@midwayjs/core'
 import { Transform } from 'class-transformer'
-import { Column as DrizzleColumn, SQL, Table } from 'drizzle-orm'
+import { Column as DrizzleColumn, SQL } from 'drizzle-orm'
 import { Drizzle } from '../drizzle'
-import { JoinType } from '../query'
+import type { From, JoinType } from '../query'
 import { OnLoad, OnLoadCallback } from './onLoad'
 
-type From = Table
 type Join = {
     type?: JoinType
     from: From
@@ -39,6 +38,10 @@ export function Entity<T extends BaseEntity = any>(from: From, options?: EntityO
     }
 }
 
+export function isEntityClass(clz: Class) {
+    return getEntityMeta(clz) != null
+}
+
 export function getEntityMeta(clz: Class): EntityMeta | null {
     const result = getClassMetadata(entityKey, clz)
     if (result == null) {
@@ -49,10 +52,6 @@ export function getEntityMeta(clz: Class): EntityMeta | null {
     }
 
     return result ?? null
-}
-
-export function isEntityClass(clz: Class) {
-    return getEntityMeta(clz) != null
 }
 
 type ReadValue<T> = (val: any, key: string | symbol, entity: T) => unknown
@@ -111,8 +110,8 @@ export function getColumnsMeta(clz: Class): ColumnMeta[] {
 }
 
 export function getEntityDefinition(clz: Class) {
-    const { from, ...rest } = getEntityMeta(clz) ?? {}
-    if (from == null) {
+    const meta = getEntityMeta(clz)
+    if (meta == null) {
         throw new Error(`Class \`${clz.name}\` is not defined as entity.`)
     }
 
@@ -122,8 +121,7 @@ export function getEntityDefinition(clz: Class) {
     }
 
     return {
-        from,
-        ...rest,
+        ...meta,
         columns
     }
 }

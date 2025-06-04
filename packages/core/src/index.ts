@@ -1,5 +1,4 @@
-export * from './data/activeDataProvider'
-export * from './data/arrayDataProvider'
+export * from './data'
 export * from './decorator/action'
 export * from './decorator/field'
 export * from './decorator/sortable'

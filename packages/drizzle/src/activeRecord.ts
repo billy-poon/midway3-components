@@ -140,7 +140,7 @@ export class AbstractActiveRecord<T extends Table> {
         return result
     }
 
-    protected createWhereFromPk() {
+    protected createCondition() {
         const pk = this.pk()
         const table = this.constructor.table()
 
@@ -187,9 +187,9 @@ export class AbstractActiveRecord<T extends Table> {
         const columns = this.constructor.columns()
         return Object.entries(columns)
             .reduce(
-                (res, [k]) => (res[k] = this[k], res),
+                (res, [k]) => (res[k] = this[k] ?? undefined, res),
                 {} as Record<string, unknown>
-            ) as Partial<RowOf<T>>
+            ) as Partial<RowOf<T, true>>
     }
 
     dirtyAttributes() {
@@ -276,7 +276,7 @@ export class AbstractActiveRecord<T extends Table> {
     protected async afterInsert(values: Partial<RowOf<T>>) {}
 
     protected async update() {
-        const where = this.createWhereFromPk()
+        const where = this.createCondition()
         const ctor = this.constructor
 
         const values = this.dirtyAttributes()
@@ -301,7 +301,7 @@ export class AbstractActiveRecord<T extends Table> {
     protected async afterUpdate(values: Partial<RowOf<T>>) {}
 
     async refresh() {
-        const where = this.createWhereFromPk()
+        const where = this.createCondition()
         const model = await this.constructor.findOne(where)
         if (model == null) {
             throw new Error('Object not found.')
@@ -313,7 +313,7 @@ export class AbstractActiveRecord<T extends Table> {
 
     async delete() {
         if (await this.beforeDelete()) {
-            const where = this.createWhereFromPk()
+            const where = this.createCondition()
             const ctor = this.constructor
 
             const result = await ctor.db()
@@ -351,7 +351,7 @@ export class AbstractActiveRecord<T extends Table> {
 }
 
 export function ActiveRecord<T extends Table>(table: T, dataSource?: Drizzle | string): ActiveRecordConstructor<T>
-export function ActiveRecord<T extends Table>(table: T, dataSource?: Drizzle | string) {
+export function ActiveRecord<T extends Table>(table: T, dataSource?: Drizzle | string): any {
     return class extends AbstractActiveRecord<T> {
         static db() {
             if (typeof dataSource === 'object') {

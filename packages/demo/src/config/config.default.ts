@@ -42,6 +42,7 @@ export default {
         default: {
             casing: 'snake_case'
         },
+        defaultDataSourceName: 'postgres',
         dataSource: {
             postgres: {
                 // https://wiki.postgresql.org/wiki/Sample_Databases

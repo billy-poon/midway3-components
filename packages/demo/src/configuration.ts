@@ -44,7 +44,7 @@ export class MainConfiguration implements ILifeCycle {
             core.ContextMiddleware,
             {
                 middleware: web.RESTfulMiddleware,
-                options: { match: /^\/api\// },
+                options: { match: /^\/(api|rest)\// },
             },
         ])
         // add filter

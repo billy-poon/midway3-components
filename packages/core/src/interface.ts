@@ -33,6 +33,9 @@ export interface ConfigurationOptions {
     }
 }
 
+export type KeyOf<T> = T extends object
+    ? Exclude<keyof T, number> : (string | symbol)
+
 export type Class<T = any, A extends [] = any> = new (...args: A) => T
 export type AbstractClass<T = any, A extends [] = any> = abstract new (...args: A) => T
 

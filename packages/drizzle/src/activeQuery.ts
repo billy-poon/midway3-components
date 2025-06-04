@@ -1,13 +1,13 @@
-import { Class, configure, getSortableOptions, QueryInterface, SortableOptions } from '@midway3-components/core'
+import { Class, configure, getSortableOptions, isClass, QueryInterface, SortableOptions } from '@midway3-components/core'
 import { ORDER } from '@midway3-components/core/dist/data'
-import { isClass } from '@midwayjs/core/dist/util/types'
 import { plainToInstance } from 'class-transformer'
-import { and, asc, desc, eq, isNull, isSQLWrapper, SQL, sql } from 'drizzle-orm'
-import { EntityClass } from './decorator/entity'
+import { and, asc, desc, eq, isNull, isSQLWrapper, SQL, sql, SQLWrapper } from 'drizzle-orm'
+import { EntityClass, isEntityClass } from './decorator/entity'
 import { triggerOnLoad } from './decorator/onLoad'
+import { Drizzle } from './drizzle'
 import { createQuery, Query, QueryConfig, QueryResultOf, QuerySession } from './query'
 import { ActiveRecordOf, RowOf, SelectedFields } from './types'
-import { isDrizzleColumn } from './utils'
+import { isDrizzleColumn } from './utils/db'
 
 export type Condition<T extends object> =
     | SQL
@@ -19,27 +19,31 @@ function buildCondition(data: object, fields: SelectedFields): SQL | undefined {
     const items = Object.entries(data)
         .map(([k, v]) => {
             const column = fields[k]
-            if (isDrizzleColumn(column)) {
+            if (isDrizzleColumn(column) || isSQLWrapper(column)) {
                 return v == null
                     ? isNull(column)
-                    : eq(column, v)
+                    : eq(column as SQLWrapper, v)
             }
-            throw new Error('Property is not bound to a table column: ' + k)
+            throw new Error('Property is not bound to a table column or SQL: ' + k)
         })
 
     return and(...items)
 }
 
-export class ActiveQuery<T extends object> implements QueryInterface<T> {
-    static create<M extends object>(entityClz: EntityClass<M>): ActiveQuery<Query<M>>
+export class ActiveQuery<T extends object> implements QueryInterface<T>, SQLWrapper {
+    static create<M extends object>(entityClz: EntityClass<M>, dataSource?: Drizzle | string ): ActiveQuery<M>
     static create<Q extends Query<object>>(query: Q): ActiveQuery<QueryResultOf<Q>>
-    static create(x: any) {
-        const modelClass = isClass(x) ? x : undefined
-        const query: Query<any> = isClass(x)
-            ? createQuery(x)
-            : x
+    static create(x: any, y?: any) {
+        if (isClass(x)) {
+            if (isEntityClass(x)) {
+                const query = createQuery(x, y)
+                return new ActiveQuery(query, x)
+            }
 
-        return new ActiveQuery(query, modelClass)
+            throw new Error('Unsupported class: ' + x.name)
+        }
+
+        return new ActiveQuery(x)
     }
 
     constructor(
@@ -166,6 +170,10 @@ export class ActiveQuery<T extends object> implements QueryInterface<T> {
         const command = sql`select count(*) as count from (${this.query}) as __`
         return this.getSession().count(command)
     }
+
+    getSQL(): SQL {
+        return this.query.getSQL()
+    }
 }
 type Executable = {
     execute(...args: any): any
@@ -178,11 +186,12 @@ function patchQuery<T extends Executable>(query: T, modelClass: Class): T {
         const execute = async (...args: any) => {
             const result = await original.call(query, ...args)
             if (Array.isArray(result) && result.length > 0) {
-                const items = plainToInstance(modelClass, result)
-                    .map((entity, i) => ({
-                        entity,
-                        data: result[i]
-                    }))
+                const items = plainToInstance(modelClass, result, {
+                    enableImplicitConversion: true
+                }).map((entity, i) => ({
+                    entity,
+                    data: result[i]
+                }))
 
                 const array = await triggerOnLoad(modelClass, items)
                 return (array ?? items).map(x => x.entity)

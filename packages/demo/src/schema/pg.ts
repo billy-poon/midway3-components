@@ -37,3 +37,9 @@ export const categoryTable = pgTable('category', {
     name: text().notNull(),
     lastUpdate: timestamp(),
 })
+
+export const countryTable = pgTable('country', {
+    countryId: serial().primaryKey(),
+    country: text().notNull(),
+    lastUpdate: timestamp(),
+})

@@ -3,14 +3,15 @@ import { getDataSource } from './dataSourceManager'
 import { EntityClass, getEntityDefinition } from './decorator/entity'
 import type { Drizzle, Executable } from './drizzle'
 import { SelectedFields } from './types'
-import { isDrizzleColumn } from './utils'
+import { isDrizzleColumn } from './utils/db'
 
+export type From = Table | SQLWrapper
 export type JoinType = 'left' | 'right' | 'inner'
 
 export interface Query<T = unknown> extends Executable<T[]> {
-    leftJoin: (table: Table | SQL, on: SQL) => unknown
-    rightJoin: (table: Table | SQL, on: SQL) => unknown
-    innerJoin: (table: Table | SQL, on: SQL) => unknown
+    leftJoin: (table: From, on: SQL) => unknown
+    rightJoin: (table: From, on: SQL) => unknown
+    innerJoin: (table: From, on: SQL) => unknown
 
     where(where?: SQL): any
     orderBy(...items: SQL[]): any
@@ -67,8 +68,7 @@ export function createQuery<T extends object>(clz: EntityClass<T>, dataSource?: 
 
     // if (!isPostgres(drizzle)) return;
 
-    const result = drizzle.select(fields as Fields)
-        .from(from)
+    const result = drizzle.select(fields as Fields).from(from)
 
     const { joins = [] } = options ?? {}
     if (joins.length > 0) {

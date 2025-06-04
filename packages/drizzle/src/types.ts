@@ -26,13 +26,16 @@ export type NullableColumnDataTypeOf<T extends Column> = ColumnConfigOf<T>['notN
 
 export type RowOf<T extends Table, NotNull extends boolean = false> = {
     [K in ColumnKeyOf<T>]: NotNull extends true
-    ? ColumnDataTypeOf<ColumnOf<T, K>>
-    : NullableColumnDataTypeOf<ColumnOf<T, K>>
+        ? ColumnDataTypeOf<ColumnOf<T, K>>
+        : NullableColumnDataTypeOf<ColumnOf<T, K>>
 }
 
 export type ActiveRecordOf<T extends Table> = {
     readonly $row: RowOf<T> | undefined
 }
+
+export type ActiveRowOf<T, NotNull extends boolean = false> = T extends ActiveRecordOf<infer P>
+    ? RowOf<P, NotNull> : never
 
 export type SelectedFields = Record<string, Column | SQL>
 export type SelectedResult<T extends SelectedFields> = {

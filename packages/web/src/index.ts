@@ -1,4 +1,6 @@
+export * from './controller/restfulController'
 export * from './decorator/render'
+export * from './decorator/restful'
 export * from './interface'
 export * from './middleware/restful.middleware'
 export * from './service/serializeService'

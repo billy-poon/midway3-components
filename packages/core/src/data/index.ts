@@ -1,6 +1,7 @@
 export * from './activeDataProvider'
 export * from './arrayDataProvider'
 export * from './baseDataProvider'
+export * from './dataStore'
 export * from './model'
 export * from './pagination'
 export * from './parameterized'

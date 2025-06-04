@@ -140,9 +140,7 @@ export class ComponentFramework extends BaseFramework<
         )
 
         if (getCurrentMainFramework() === this) {
-            // keep process alive before `start()`
-            const clear = keepProcessAlive()
-            this.start(clear)
+            this.start()
         }
     }
 
@@ -242,12 +240,14 @@ export class ComponentFramework extends BaseFramework<
         return result.split(' ', 2)[0]
     }
 
-    async start(parsedCb?: () => void) {
+    async start() {
+        // keep process alive before `start()`
+        const clear = keepProcessAlive()
         try {
             this.logger.debug('start app')
 
             const argv = await this.app.parseAsync()
-            parsedCb?.()
+            clear()
 
             const { command, exitCode } = argv[CTX] ?? {}
             if (command == null) {
@@ -266,6 +266,8 @@ export class ComponentFramework extends BaseFramework<
             await this.destroy(exitCode)
         } catch (err) {
             this.destroy(-1, err)
+        } finally {
+            clear()
         }
     }
 

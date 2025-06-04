@@ -1,8 +1,6 @@
 const { Bootstrap } = require('@midwayjs/bootstrap');
 const { join } = require('path');
 
-process.env.CLI_ENV = process.env.NODE_ENV
-
 function createLogger() {
     const noop = () => { }
     return {

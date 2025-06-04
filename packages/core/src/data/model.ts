@@ -4,6 +4,8 @@ import { applyMixins } from '../utils'
 type Class<T = any> = new (...args: any) => T
 export type ModelErrors = Record<string, string[]>
 
+const classType = Symbol('@midway3-components/core:data/model')
+
 export class AbstractModel {
     /** @internal */
     static classType() {
@@ -168,8 +170,6 @@ export class ProxyModel extends AbstractModel {
         return super.getFieldDefinitions.call(this.data, jsonData)
     }
 }
-
-const classType = Symbol('@midway3-components/core:model')
 
 export interface ModelConstructor {
     new (args?: any): AbstractModel

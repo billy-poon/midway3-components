@@ -21,11 +21,11 @@ export class DrizzleDataSourceManager extends DataSourceManager<Drizzle> {
     }
 
     getName(): string {
-        return 'midwayjs:drizzle'
+        return 'drizzle'
     }
 
     getDefaultDataSourceName(): string {
-        return this.configOptions.defaultDataSourceName ?? 'default'
+        return super.getDefaultDataSourceName() || 'default'
     }
 
     protected async createDataSource(config: DrizzleDataSourceOptions, dataSourceName: string): Promise<void | Drizzle> {

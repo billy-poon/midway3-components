@@ -1,4 +1,4 @@
-import { SQL, DrizzleConfig as _DrizzleConfig } from 'drizzle-orm'
+import { SQL, SQLWrapper, DrizzleConfig as _DrizzleConfig } from 'drizzle-orm'
 import * as op from 'drizzle-orm/sql/expressions/conditions'
 import { MySQL2DataSourceOptions, PostgresDataSourceOptions, ProtocolType, SQLiteDataSourceOptions } from './dialects'
 import { Query } from './query'
@@ -15,11 +15,11 @@ export type DrizzleDataSourceOptions =
     | PostgresDataSourceOptions
     | (DrizzleConfig & { connection?: `${ProtocolType}://${string}` })
 
-export interface Executable<T = unknown> {
+export interface Executable<T = unknown> extends SQLWrapper {
     execute(): T | Promise<T>
 }
 
-export interface ExecutableConditional<T = unknown> extends Executable<T> {
+export interface ConditionalExecutable<T = unknown> extends Executable<T> {
     where(where?: SQL): Omit<this, 'where'>
 }
 
@@ -28,22 +28,22 @@ export type QueryResultOf<T extends Query> = T extends Query<infer P>
     ? P : never
     : never
 
-export type SelectBuilder<T extends SelectedFields | undefined> = {
-    from<TTable extends Table>(table: TTable): Query<
+export interface SelectBuilder<T extends SelectedFields | undefined> {
+    from<TTable extends Table>(from: TTable | SQLWrapper): Query<
         T extends SelectedFields
             ? SelectedResult<T> : RowOf<TTable>
     >
 }
 
-export type InsertBuilder<T extends Table> = {
+export interface InsertBuilder<T extends Table> {
     values(values: Partial<RowOf<T>>): Executable
 }
 
-export type UpdateBuilder<T extends Table> = {
-    set(values: Partial<RowOf<T>>): ExecutableConditional
+export interface UpdateBuilder<T extends Table> {
+    set(values: Partial<RowOf<T>>): ConditionalExecutable
 }
 
-export type DeleteCommand = ExecutableConditional
+export type DeleteCommand = ConditionalExecutable
 
 export interface Drizzle {
     readonly $client: {
@@ -51,6 +51,7 @@ export interface Drizzle {
         close?(): unknown
         connect?(): unknown
     }
+
     select(): SelectBuilder<undefined>
     select<T extends SelectedFields>(fields: T): SelectBuilder<T>
     insert<T extends Table>(table: T): InsertBuilder<T>

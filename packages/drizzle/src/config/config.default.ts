@@ -2,7 +2,7 @@ import { ConfigurationOptions } from '../interface'
 
 const defaultConfig = {
     drizzle: {
-        defaultDataSourceName: 'default',
+        // defaultDataSourceName: 'default',
     }
 } satisfies ConfigurationOptions
 
