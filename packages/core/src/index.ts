@@ -1,10 +1,8 @@
 export * from './data'
-export * from './decorator/action'
-export * from './decorator/field'
-export * from './decorator/sortable'
+export * from './decorator'
 export * from './interface'
-export * from './middleware/context.middleware'
-export * from './service/serializeService'
+export * from './middleware'
+export * from './service'
 export * from './utils'
 
 export { ComponentConfiguration as Configuration } from './configuration'

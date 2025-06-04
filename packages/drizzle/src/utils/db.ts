@@ -1,9 +1,9 @@
-import { Column as DrizzleColumn, SQL, SQLWrapper } from 'drizzle-orm'
+import { Column, SQL, SQLWrapper } from 'drizzle-orm'
 import { Drizzle } from '../drizzle'
-import { Column, ColumnKeyOf, ColumnsOf, Table } from '../types'
+import { ColumnKeyOf, ColumnsOf, DrizzleColumn, Table } from '../types'
 
-export function isDrizzleColumn(column: unknown): column is Column {
-    return column instanceof DrizzleColumn
+export function isDrizzleColumn(column: unknown): column is DrizzleColumn {
+    return column instanceof Column
 }
 
 

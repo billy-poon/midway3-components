@@ -1,5 +1,5 @@
 import { ArrayDataProvider, configure, DataStore, QueryInterface } from '@midway3-components/core'
-import { RESTful, RESTfulController, RESTfulFrom } from '@midway3-components/web'
+import { RESTfulController, RESTfulControllerClass, RESTfulFrom } from '@midway3-components/web'
 import { Rule, RuleType } from '@midwayjs/validate'
 
 interface Person {
@@ -63,8 +63,8 @@ class PeopleStore implements DataStore<Person> {
 
 const peopleStore = new PeopleStore()
 
-@RESTful('/rest/people')
-export class PeopleController extends RESTfulController(peopleStore, { editBodyClz: EditForm }) {
+@RESTfulController('/rest/people')
+export class PeopleController extends RESTfulControllerClass(peopleStore, { editBodyClz: EditForm }) {
     async indexAction() {
         const { items } = peopleStore
         return new ArrayDataProvider(items)

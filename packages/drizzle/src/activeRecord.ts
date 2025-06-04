@@ -28,7 +28,7 @@ function normalizeCondition<T extends ActiveRecordConstructor>(val: ActiveCondit
 }
 
 export interface ActiveRecordConstructor<T extends Table = any> {
-    new (...args: any): AbstractActiveRecord<T> & RowOf<T>
+    new (...args: any): BaseActiveRecord<T> & RowOf<T>
 
     db(): Drizzle
     table(): T
@@ -42,15 +42,15 @@ export interface ActiveRecordConstructor<T extends Table = any> {
     findAll<C extends ActiveRecordConstructor>(this: C, condition?: ActiveCondition<C>): Promise<InstanceType<C>[]>
 }
 
-export interface AbstractActiveRecord<T extends Table> extends ActiveRecordOf<T> {
+export interface BaseActiveRecord<T extends Table> extends ActiveRecordOf<T> {
     constructor: ActiveRecordConstructor<T>
 }
 
-@OnLoad<AbstractActiveRecord<any>>(async (x, v) => {
+@OnLoad<BaseActiveRecord<any>>(async (x, v) => {
     await x.afterFind(v)
 })
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-export class AbstractActiveRecord<T extends Table> {
+export class BaseActiveRecord<T extends Table> {
     static db() {
         return getDataSource()
     }
@@ -350,9 +350,9 @@ export class AbstractActiveRecord<T extends Table> {
     }
 }
 
-export function ActiveRecord<T extends Table>(table: T, dataSource?: Drizzle | string): ActiveRecordConstructor<T>
-export function ActiveRecord<T extends Table>(table: T, dataSource?: Drizzle | string): any {
-    return class extends AbstractActiveRecord<T> {
+export function ActiveRecordClass<T extends Table>(table: T, dataSource?: Drizzle | string): ActiveRecordConstructor<T>
+export function ActiveRecordClass<T extends Table>(table: T, dataSource?: Drizzle | string): any {
+    return class extends BaseActiveRecord<T> {
         static db() {
             if (typeof dataSource === 'object') {
                 return dataSource

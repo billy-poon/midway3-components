@@ -1,15 +1,15 @@
-import { ActiveRecord, isSQLite, Table } from '@midway3-components/drizzle'
+import { ActiveRecordClass, isSQLite, Table } from '@midway3-components/drizzle'
 import { categoryTable } from '../schema/pg'
 
 function CreateActiveRecord<T extends Table>(table: T) {
     const name = table.constructor.name
     if (name === 'MySqlTable') {
-        return ActiveRecord(table, 'mysql')
+        return ActiveRecordClass(table, 'mysql')
     } else if (name === 'PgTable') {
-        return ActiveRecord(table, 'postgres')
+        return ActiveRecordClass(table, 'postgres')
     }
 
-    return ActiveRecord(table, 'sqlite')
+    return ActiveRecordClass(table, 'sqlite')
 }
 
 export class Category extends CreateActiveRecord(categoryTable) {

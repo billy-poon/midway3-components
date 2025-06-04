@@ -5,7 +5,7 @@ export type Schema = Record<string, unknown>
 export type Table<T extends TableConfig = any> = _Table<T>
 export type TableConfigOf<T extends Table> = T extends Table<infer P> ? P : never
 
-export type { Column }
+export type { Column as DrizzleColumn }
 export type ColumnsOf<T extends Table> = TableConfigOf<T>['columns']
 export type ColumnKeyOf<T extends Table> = keyof ColumnsOf<T>
 

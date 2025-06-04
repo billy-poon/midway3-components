@@ -1,11 +1,11 @@
 import { IAction, SerializeService } from '@midway3-components/core'
-import { AbstractModel } from '@midway3-components/core/dist/data'
+import { BaseModel } from '@midway3-components/core/dist/data'
 import { Body, Inject, Provide } from '@midwayjs/core'
 import { Rule, RuleType } from '@midwayjs/validate'
 import { Category } from '../../../entity/category.drizzle'
 
 // extends from `AbstractModel` to store validation error
-class CreateDTO extends AbstractModel {
+class CreateDTO extends BaseModel {
     @Rule(RuleType.required().label('Name'))
     name: string
 }

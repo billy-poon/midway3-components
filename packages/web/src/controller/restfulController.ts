@@ -2,11 +2,10 @@ import { ActiveDataProvider, Awaitable, Class, configure, DataProviderInterface,
 import { Context, getCurrentApplicationContext, transformRequestObjectByType } from '@midwayjs/core'
 import { ForbiddenError, HttpStatus, NotFoundError } from '@midwayjs/core/dist/error/http'
 import { isObject } from '@midwayjs/core/dist/util/types'
-import { getRESTfulDefinition } from '../decorator/restful'
+import { getRESTfulDefinition } from '../decorator/restfulController'
 
-export interface RESTfulInterface<T = any, C extends Context = any> {
+export interface RESTfulControllerInterface<T = any, C extends Context = any> {
     indexAction(ctx: C, ...args: any): Promise<DataProviderInterface<T> | T[]>
-
     viewAction(ctx: C, ...args: any): Promise<T>
 
     createAction?(ctx: C, ...args: any): Promise<T>
@@ -19,7 +18,7 @@ export interface RESTfulFrom<T> {
 }
 
 export type Scenario = keyof ({
-    [K in keyof RESTfulInterface as K extends `${infer P}Action` ? P : never]: unknown
+    [K in keyof RESTfulControllerInterface as K extends `${infer P}Action` ? P : never]: unknown
 })
 
 export interface RESTfulControllerOptions {
@@ -33,7 +32,7 @@ function defaultApply<T extends object>(target: T, form: object) {
     return configure(target, form)
 }
 
-export class BaseRESTfulController<T extends object, C extends Context = any> implements RESTfulInterface<T, C> {
+export class BaseRESTfulController<T extends object, C extends Context = any> implements RESTfulControllerInterface<T, C> {
     constructor(
         protected readonly store: DataStore<T>
     ) {}
@@ -119,7 +118,7 @@ export class BaseRESTfulController<T extends object, C extends Context = any> im
     }
 
     protected paramName() {
-        const ctor = this.constructor as Class<RESTfulInterface>
+        const ctor = this.constructor as Class<RESTfulControllerInterface>
         const meta = getRESTfulDefinition(ctor)
         return meta?.routerOptions?.paramName || 'id'
     }
@@ -158,8 +157,8 @@ export class BaseRESTfulController<T extends object, C extends Context = any> im
 
 export type RESTfulControllerConstructor<T extends object, C extends Context> = new (...args: any) => BaseRESTfulController<T, C>
 
-export function RESTfulController<T extends object, C extends Context = any>(store: DataStore<T>, options?: RESTfulControllerOptions): RESTfulControllerConstructor<T, C>
-export function RESTfulController<T extends object, C extends Context = any>(store: DataStore<T>, options?: RESTfulControllerOptions) {
+export function RESTfulControllerClass<T extends object, C extends Context = any>(store: DataStore<T>, options?: RESTfulControllerOptions): RESTfulControllerConstructor<T, C>
+export function RESTfulControllerClass<T extends object, C extends Context = any>(store: DataStore<T>, options?: RESTfulControllerOptions) {
     return class extends BaseRESTfulController<T, C> {
         constructor() {
             super(store)

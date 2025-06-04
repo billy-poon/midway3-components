@@ -1,5 +1,5 @@
 import { SerializeService as BaseService } from '@midway3-components/core'
-import { AbstractModel, Pagination } from '@midway3-components/core/dist/data'
+import { BaseModel, Pagination } from '@midway3-components/core/dist/data'
 import { BaseDataProvider } from '@midway3-components/core/dist/data/baseDataProvider'
 import { Config, Context, Inject, Provide } from '@midwayjs/core'
 import { Pagination as WebPagination } from '../data/pagination'
@@ -108,7 +108,7 @@ export class SerializeService extends BaseService {
         }
     }
 
-    protected serializeModelErrors(model: AbstractModel) {
+    protected serializeModelErrors(model: BaseModel) {
         this.ctx.status = 422 // Data Validation Failed.
         return super.serializeModelErrors(model)
     }

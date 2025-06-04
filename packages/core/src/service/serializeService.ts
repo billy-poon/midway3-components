@@ -1,6 +1,6 @@
 import { Config, Init, Provide } from '@midwayjs/core'
 import { BaseDataProvider, isDataProvider } from '../data/baseDataProvider'
-import { AbstractModel, isModel, ProxyModel } from '../data/model'
+import { BaseModel, isModel, ProxyModel } from '../data/model'
 import { Pagination } from '../data/pagination'
 import { Sort } from '../data/sort'
 import { ConfigurationOptions, ParametersFactory, RequestParameters, SerializerOptions } from '../interface'
@@ -109,7 +109,7 @@ export class SerializeService implements SerializerOptions {
         return m.serialize(fields, expand)
     }
 
-    protected serializeModelErrors(model: AbstractModel) {
+    protected serializeModelErrors(model: BaseModel) {
         return Object.entries(model.getFirstErrors())
             .map(([field, message]) => ({ field, message }))
     }

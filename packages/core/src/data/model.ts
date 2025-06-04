@@ -6,7 +6,7 @@ export type ModelErrors = Record<string, string[]>
 
 const classType = Symbol('@midway3-components/core:data/model')
 
-export class AbstractModel {
+export class BaseModel {
     /** @internal */
     static classType() {
         return classType
@@ -152,7 +152,7 @@ export class AbstractModel {
     }
 }
 
-export class ProxyModel extends AbstractModel {
+export class ProxyModel extends BaseModel {
     constructor(
         readonly data: object
     ) {
@@ -171,9 +171,7 @@ export class ProxyModel extends AbstractModel {
     }
 }
 
-export interface ModelConstructor {
-    new (args?: any): AbstractModel
-}
+export type ModelConstructor = new (...args: any) => BaseModel
 
 export function ModelClass<T extends Class>(superClz: T): ModelConstructor & T
 export function ModelClass<T extends Class>(superClz: T) {
@@ -182,12 +180,12 @@ export function ModelClass<T extends Class>(superClz: T) {
             return classType
         }
     }
-    applyMixins(result, [AbstractModel])
+    applyMixins(result, [BaseModel])
 
     return result
 }
 
-export function isModel(val: unknown): val is AbstractModel {
+export function isModel(val: unknown): val is BaseModel {
     if (val != null && typeof val === 'object') {
         return isModelClass(val.constructor as Class)
     }
@@ -196,7 +194,7 @@ export function isModel(val: unknown): val is AbstractModel {
 }
 
 export function isModelClass(clz: Class) {
-    const theClz = clz as unknown as typeof AbstractModel
+    const theClz = clz as unknown as typeof BaseModel
     if (typeof theClz.classType === 'function') {
         return theClz.classType() === classType
     }

@@ -1,9 +1,7 @@
-export * from './controller/restfulController'
-export * from './decorator/render'
-export * from './decorator/restful'
+export * from './controller'
+export * from './decorator'
 export * from './interface'
-export * from './middleware/restful.middleware'
-export * from './service/serializeService'
-export * from './service/urlService'
+export * from './middleware'
+export * from './service'
 
 export { ComponentConfiguration as Configuration } from './configuration'

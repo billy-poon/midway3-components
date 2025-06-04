@@ -1,31 +1,31 @@
 import { Class, DecoratorKey } from '@midway3-components/core'
 import { Controller, Del, Get, getClassMetadata, listModule, MidwayWebRouterService, Patch, Post, Provide, Put, saveClassMetadata, saveModule } from '@midwayjs/core'
-import type { RESTfulInterface } from '../controller/restfulController'
+import type { RESTfulControllerInterface } from '../controller/restfulController'
 
 type RouterOptions = Exclude<Parameters<typeof Controller>[1], undefined> & {
     paramName?: string
 }
 
-type RESTfulOptions = {
+type ControllerOptions = {
     prefix: string
     routerOptions?: RouterOptions
 }
 
-const key: DecoratorKey<RESTfulOptions>
+const key: DecoratorKey<ControllerOptions>
     = '@midway3-components/web/decorator:restful-controller'
 
-type RESTfulClass = Class<RESTfulInterface>
-const moduleKey: DecoratorKey<RESTfulClass> = key
+type RESTfulControllerClass = Class<RESTfulControllerInterface>
+const moduleKey: DecoratorKey<RESTfulControllerClass> = key
 
-export function RESTful(prefix: string, routerOptions?: RouterOptions) {
-    return <T extends RESTfulClass>(target: T) => {
+export function RESTfulController(prefix: string, routerOptions?: RouterOptions) {
+    return <T extends RESTfulControllerClass>(target: T) => {
         Provide()(target)
         saveModule(moduleKey, target)
         saveClassMetadata(key, { prefix, routerOptions }, target)
     }
 }
 
-export function getRESTfulDefinition(target: RESTfulClass) {
+export function getRESTfulDefinition(target: RESTfulControllerClass) {
     return getClassMetadata(key, target)
 }
 
@@ -39,15 +39,21 @@ export function registerRESTfulControllers(routerService: MidwayWebRouterService
 
         const target = x.prototype
         let params = getActionParams(target, 'indexAction')
-        if (params != null) Get('/')(...params)
+        if (params != null) {
+            Get('/')(...params)
+        }
 
         params = getActionParams(target, 'createAction')
-        if (params != null) Post('/')(...params)
+        if (params != null) {
+            Post('/')(...params)
+        }
 
         const prefix = `/:${meta.routerOptions?.paramName || 'id'}`
 
         params = getActionParams(target, 'viewAction')
-        if (params != null) Get(prefix)(...params)
+        if (params != null) {
+            Get(prefix)(...params)
+        }
 
         params = getActionParams(target, 'updateAction')
         if (params != null) {
@@ -56,17 +62,28 @@ export function registerRESTfulControllers(routerService: MidwayWebRouterService
         }
 
         params = getActionParams(target, 'deleteAction')
-        if (params != null) Del(prefix)(...params)
+        if (params != null) {
+            Del(prefix)(...params)
+        }
 
         routerService.addController(x, meta)
     })
 }
 
-type ActionType = keyof RESTfulInterface
-function getActionParams(target: any, propertyKey: ActionType) {
+type ActionType = keyof RESTfulControllerInterface
+function getActionParams(target: object, propertyKey: ActionType): [object, ActionType, PropertyDescriptor] | null {
     const descriptor = Object.getOwnPropertyDescriptor(target, propertyKey)
     if (descriptor != null) {
-        return [target, propertyKey, descriptor] as const
+        return [target, propertyKey, descriptor]
+    }
+
+    const parent = Object.getPrototypeOf(target)
+    if (parent != null) {
+        const result = getActionParams(parent, propertyKey)
+        if (result != null) {
+            result[0] = target
+            return result
+        }
     }
 
     return null
