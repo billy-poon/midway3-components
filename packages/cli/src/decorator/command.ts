@@ -38,11 +38,19 @@ export function listCommandClass() {
 }
 
 export function getCommandDefinition(clz: Class) {
-    const options = getClassMetadata(metaKey, clz)
+    const {
+        commandMethod = 'exec',
+        ...rest
+    } = getClassMetadata(metaKey, clz) ?? {}
+
+    const methodName = typeof clz.prototype[commandMethod] === 'function'
+        ? commandMethod : undefined
+
     return {
-        ...options,
+        ...rest,
         commandClass: clz,
-        options: listOptions(clz),
+        commandMethod,
+        options: listOptions(clz, methodName),
         positionals: listPositionals(clz),
     }
 }

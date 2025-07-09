@@ -46,7 +46,7 @@ export class ComponentFramework extends BaseFramework<
     ComponentOptions,
     NextFunction
 > {
-    declare app: Application<ParsedArgv>
+    app: Application<ParsedArgv>
 
     configure() {
         return this.configService.getConfiguration('cli')
@@ -134,6 +134,9 @@ export class ComponentFramework extends BaseFramework<
     }
 
     async run(): Promise<void> {
+        const globalMiddleware = await this.applyMiddleware()
+        this.useMiddleware(globalMiddleware)
+
         const commandList = listCommandClass()
         commandList.forEach(
             x => this.registerCommandClass(x)
@@ -161,14 +164,12 @@ export class ComponentFramework extends BaseFramework<
             middlewares
         } = definition
 
-        const theCommandMethod = commandMethod ?? 'exec'
-
         let theCommand = command
         if (theCommand == null) {
             let theName = commandName != null
                 ? commandName : (parentName == null
                     ? identity(commandClass.name, 'Command')
-                    : identity(theCommandMethod, 'Command')
+                    : identity(commandMethod, 'Command')
                 )
 
             if (parentName != null) {
@@ -187,7 +188,7 @@ export class ComponentFramework extends BaseFramework<
 
         this.logger.debug('register command: %s', theCommand)
         const result: string = Array.isArray(theCommand) ? theCommand[0] : theCommand
-        if (commandMethod != null || typeof commandClass.prototype[theCommandMethod] === 'function') {
+        if (typeof commandClass.prototype[commandMethod] === 'function') {
             this.app.command(
                 theCommand,
                 (description ?? '') as string,
@@ -214,9 +215,9 @@ export class ComponentFramework extends BaseFramework<
                     const rootMiddleware = await this.applyMiddleware(commandMiddleware)
                     await rootMiddleware(ctx, async () => {
                         const commandObj = await ctx.requestContext.getAsync(commandClass)
-                        const method = commandObj[theCommandMethod]
+                        const method = commandObj[commandMethod]
                         if (typeof method !== 'function') {
-                            throw new Error(`Command method is not defined: ${commandClass.name}.${String(theCommandMethod)}()`)
+                            throw new Error(`Command method is not defined: ${commandClass.name}.${String(commandMethod)}()`)
                         }
 
                         ;[...namedOptions, ...positionalOptions].forEach(x => {
