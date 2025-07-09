@@ -1,6 +1,6 @@
 {
   "name": "@midway3-components/drizzle",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "",
   "main": "dist/index.js",
   "typings": "index.d.ts",
@@ -10,7 +10,7 @@
     "index.d.ts"
   ],
   "scripts": {
-    "build": "rm -rf ./dist && tsc",
+    "build": "rm -rf ./dist && tsc -b && touch package.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

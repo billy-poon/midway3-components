@@ -6,3 +6,5 @@ try.*
 *-local
 *-local.*
 !.gitignore
+
+*.tsbuildinfo*

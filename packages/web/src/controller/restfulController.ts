@@ -61,7 +61,7 @@ export class BaseRESTfulController<T extends object, C extends Context = any> im
         const body = await this.getRequestBody(ctx, 'create') as RESTfulFrom<T>
 
         const mutated = typeof body.apply === 'function'
-            ? body.apply(model) as any ?? model
+            ? body.apply(model) ?? model
             : defaultApply(model, body)
 
         const result = store.save(mutated)
@@ -77,7 +77,7 @@ export class BaseRESTfulController<T extends object, C extends Context = any> im
         const body = await this.getRequestBody(ctx, 'update') as RESTfulFrom<T>
 
         const mutated = typeof body.apply === 'function'
-            ? body.apply(model) as any ?? model
+            ? body.apply(model) ?? model
             : defaultApply(model, body)
 
         const result = this.store.save(mutated)

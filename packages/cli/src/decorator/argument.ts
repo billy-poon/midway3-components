@@ -1,4 +1,4 @@
-import { Class, DecoratorKey, identity } from '@midway3-components/core'
+import { Class, DecoratorKey, getSuperClass, identity, isClass } from '@midway3-components/core'
 import { getPropertyDataFromClass, listPropertyDataFromClass, savePropertyDataToClass } from '@midwayjs/core'
 import { inferOptionType } from '../utils'
 import { createParameterDecorator } from './parameter'
@@ -81,14 +81,19 @@ export function createArgumentDecorator<T extends ArgumentOptions>(decoratorName
 
     type Definition = DefinitionOf<T>
 
-    function list(clz: Class, methodName?: string | symbol) {
-        const result = (listPropertyDataFromClass(PROP_KEY, clz) as Meta[])
+    function list(clz: Class, methodName?: string | symbol): Definition[] {
+        const superClz = getSuperClass(clz)
+        const result = isClass(superClz) ? list(superClz) : []
+
+        const locals = (listPropertyDataFromClass(PROP_KEY, clz) as Meta[])
             .map(({ propertyKey, options }): Definition => ({
                 ...options,
                 propertyKey,
                 name: options.name ?? identity(propertyKey, 'Option'),
                 type: options.type ?? inferOptionType(clz, propertyKey)
             }))
+
+        result.push(...locals)
         if (methodName == null) {
             return result
         }
