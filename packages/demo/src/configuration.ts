@@ -1,4 +1,3 @@
-import * as core from '@midway3-components/core'
 import * as drizzle from '@midway3-components/drizzle'
 import * as web from '@midway3-components/web'
 import { App, Configuration, ILifeCycle, IMidwayContainer } from '@midwayjs/core'
@@ -17,7 +16,6 @@ import { registerSerializeService } from './service/serialize.service'
 @Configuration({
     imports: [
         koa,
-        core,
         web,
         validate,
         typeorm,
@@ -41,7 +39,6 @@ export class MainConfiguration implements ILifeCycle {
         // add middleware
         this.app.useMiddleware([
             ReportMiddleware,
-            core.ContextMiddleware,
             {
                 middleware: web.RESTfulMiddleware,
                 options: { match: /^\/(api|rest)\// },

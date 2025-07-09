@@ -1,7 +1,7 @@
 import { App, Configuration, ILifeCycle, ILogger, Logger } from '@midwayjs/core'
 
 import * as cli from '@midway3-components/cli'
-import * as core from '@midway3-components/core'
+import { getCurrentContext } from '@midway3-components/core'
 import * as drizzle from '@midway3-components/drizzle'
 import { join } from 'path'
 import { OutputMiddleware } from './middleware/output.middleware'
@@ -11,7 +11,6 @@ const logLevel = process.argv.includes('--verbose') ? 'debug' : 'warn'
 @Configuration({
     imports: [
         cli,
-        core,
         drizzle,
     ],
     importConfigs: [
@@ -21,7 +20,7 @@ const logLevel = process.argv.includes('--verbose') ? 'debug' : 'warn'
                 data: {
                     serializer: {
                         paramsFactory() {
-                            return core.getCurrentContext<cli.Context>()?.argv ?? {}
+                            return getCurrentContext<cli.Context>()?.argv ?? {}
                         }
                     }
                 },
@@ -51,7 +50,6 @@ export class MainConfiguration implements ILifeCycle {
         this.logger.info('onReady()')
 
         this.app.useMiddleware([
-            core.ContextMiddleware,
             OutputMiddleware,
         ])
     }

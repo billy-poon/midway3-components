@@ -5,19 +5,6 @@ import { FunctionMiddleware, Middleware, NextFunction } from '@midwayjs/core'
 
 @Middleware()
 export class OutputMiddleware implements IMiddleware {
-    // @App()
-    // app: Application
-
-    // @Init()
-    // async init() {
-    //     const { app } = this
-    //     app.option('json', { type: 'boolean' })
-
-    //     app.option('sort', { type: 'string' })
-    //     app.option('page', { type: 'number' })
-    //     app.option('per-page', { type: 'number' })
-    // }
-
     resolve(app: Application): FunctionMiddleware<Context, NextFunction> | Promise<FunctionMiddleware<Context, NextFunction>> {
         app.option('json', { type: 'boolean' })
 
