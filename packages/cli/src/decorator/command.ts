@@ -51,7 +51,7 @@ export function getCommandDefinition(clz: Class) {
         commandClass: clz,
         commandMethod,
         options: listOptions(clz, methodName),
-        positionals: listPositionals(clz),
+        positionals: listPositionals(clz, methodName),
     }
 }
 

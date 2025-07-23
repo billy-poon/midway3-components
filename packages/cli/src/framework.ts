@@ -178,7 +178,12 @@ export class ComponentFramework extends BaseFramework<
             }
 
             const positionals = positionalOptions
-                .map(({ name, demandOption }) => demandOption ? `<${name}>` : `[${name}]`)
+                .map(({ name, demandOption, array }) => {
+                    const displayName = array
+                        ? name + '..'
+                        : name
+                    return demandOption ? `<${displayName}>` : `[${displayName}]`
+                })
 
             theCommand = [theName, ...positionals].join(' ')
             if (aliases != null) {
