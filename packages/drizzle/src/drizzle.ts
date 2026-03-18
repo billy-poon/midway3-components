@@ -2,7 +2,7 @@ import { SQL, SQLWrapper, DrizzleConfig as _DrizzleConfig } from 'drizzle-orm'
 import * as op from 'drizzle-orm/sql/expressions/conditions'
 import { MySQL2DataSourceOptions, PostgresDataSourceOptions, ProtocolType, SQLiteDataSourceOptions } from './dialects'
 import { Query } from './query'
-import { RowOf, Schema, SelectedFields, SelectedResult, Table } from './types'
+import { DrizzleColumn, RowOf, Schema, SelectedFields, SelectedResult, Table } from './types'
 
 export { op }
 export type Operations = typeof op
@@ -58,3 +58,8 @@ export interface Drizzle {
     update<T extends Table>(table: T): UpdateBuilder<T>
     delete<T extends Table>(table: T): DeleteCommand
 }
+
+export type DrizzleQueryResult<T extends DrizzleColumn> = [
+    rows: Record<string, unknown>[],
+    columns: T[]
+]

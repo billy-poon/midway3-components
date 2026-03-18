@@ -212,12 +212,18 @@ export class BaseActiveRecord<T extends Table> {
             )
     }
 
-    async save() {
+    async save(): Promise<unknown>
+    async save(refresh: true): Promise<this>
+    async save(refresh?: boolean) {
         const insert = this.isNew()
         if (!await this.beforeSave(insert)) {
             return false
         }
-        return insert ? this.insert() : this.update()
+
+        const result = insert ? this.insert() : this.update()
+        return refresh
+            ? await this.refresh()
+            : result
     }
 
     protected async beforeSave(insert: boolean) {
