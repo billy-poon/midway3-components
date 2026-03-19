@@ -220,7 +220,10 @@ export class BaseActiveRecord<T extends Table> {
             return false
         }
 
-        const result = insert ? this.insert() : this.update()
+        const result = insert
+            ? await this.insert()
+            : await this.update()
+
         return refresh
             ? await this.refresh()
             : result
