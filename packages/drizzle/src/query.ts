@@ -9,15 +9,15 @@ export type From = Table | SQLWrapper
 export type JoinType = 'left' | 'right' | 'inner'
 
 export interface Query<T = unknown> extends Executable<T[]> {
-    leftJoin: (table: From, on: SQL) => unknown
-    rightJoin: (table: From, on: SQL) => unknown
-    innerJoin: (table: From, on: SQL) => unknown
+    // leftJoin: (table: From, on: SQL) => unknown
+    // rightJoin: (table: From, on: SQL) => unknown
+    // innerJoin: (table: From, on: SQL) => unknown
 
-    where(where?: SQL): any
-    orderBy(...items: SQL[]): any
+    where(where?: SQL): this
+    orderBy(...items: SQL[]): this
 
-    offset(offset: number | Placeholder): any
-    limit(limit: number | Placeholder): any
+    offset(offset: number | Placeholder): this
+    limit(limit: number | Placeholder): this
 }
 
 export type QueryConfig = {

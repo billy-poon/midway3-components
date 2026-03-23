@@ -1,3 +1,4 @@
+import { Awaitable } from '@midway3-components/core'
 import { SQL, SQLWrapper, DrizzleConfig as _DrizzleConfig } from 'drizzle-orm'
 import * as op from 'drizzle-orm/sql/expressions/conditions'
 import { MySQL2DataSourceOptions, PostgresDataSourceOptions, ProtocolType, SQLiteDataSourceOptions } from './dialects'
@@ -57,6 +58,8 @@ export interface Drizzle {
     insert<T extends Table>(table: T): InsertBuilder<T>
     update<T extends Table>(table: T): UpdateBuilder<T>
     delete<T extends Table>(table: T): DeleteCommand
+
+    transaction<T>(transaction: (tx: Drizzle) => Awaitable<T>, config?: any): Promise<T>
 }
 
 export type DrizzleQueryResult<T extends DrizzleColumn> = [

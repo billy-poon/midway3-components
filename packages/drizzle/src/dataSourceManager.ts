@@ -2,6 +2,7 @@ import { Config, DataSourceManager, getCurrentApplicationContext, ILogger, Init,
 import { DialectType, sqliteProtocols } from './dialects'
 import { Drizzle, DrizzleDataSourceOptions } from './drizzle'
 import { DrizzleConfigOptions } from './interface'
+import { getCurrentTransaction, patchTransaction } from './patch/transaction'
 
 @Provide()
 @Scope(ScopeEnum.Singleton)
@@ -54,7 +55,7 @@ export class DrizzleDataSourceManager extends DataSourceManager<Drizzle> {
         const result = await factory(config)
         this.logger.info('[%s] client created: %s', this.getName(), dataSourceName)
 
-        return result
+        return patchTransaction(result, dataSourceName)
     }
 
     protected async checkConnected(dataSource: Drizzle): Promise<boolean> {
@@ -105,5 +106,6 @@ export function getDataSource(dataSourceName?: string) {
         throw new Error('Failed to get dataSource: ' + name)
     }
 
-    return result
+    const transaction = getCurrentTransaction(name)
+    return transaction ?? result
 }

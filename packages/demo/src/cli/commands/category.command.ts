@@ -1,4 +1,4 @@
-import { Command, ICommand, Positional, SubCommand } from '@midway3-components/cli'
+import { Command, ConsoleError, ICommand, Positional, SubCommand } from '@midway3-components/cli'
 import { ActiveDataProvider } from '@midway3-components/core'
 import { Inject } from '@midwayjs/core'
 import { CategoryController } from '../../controller/api/category/category.controller'
@@ -34,5 +34,51 @@ export class CategoryCommand implements ICommand {
     @SubCommand()
     async cud() {
         return this.ctrl.cudAction()
+    }
+
+    @SubCommand()
+    async transaction() {
+        async function print(title: string) {
+            console.log(title)
+
+            const xy = await Category
+                .find((q, t, op) => {
+                    q.where(op.lt(t.category_id, 3))
+                })
+                .all()
+            for (const v of xy) {
+                console.log('%d => %s', v.category_id, v.name)
+            }
+        }
+
+        try {
+            await Category.db().transaction(async () => {
+                print('before update:')
+
+                const [x, y] = await Category
+                    .find((q, t, op) => {
+                        q.where(op.lt(t.category_id, 3))
+                    })
+                    .all()
+
+                x.name += '(updated)'
+                await x.save(true)
+
+                y.name += '(updated)'
+                await y.save(true)
+
+                print('after update:')
+
+                throw new ConsoleError('Aborted')
+            })
+        } catch (err) {
+            if (err instanceof ConsoleError) {
+                console.log(err.message)
+            } else {
+                throw err
+            }
+        }
+
+        print('after transaction:')
     }
 }
