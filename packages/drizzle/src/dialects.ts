@@ -19,15 +19,15 @@ export type DialectType = (typeof dialects)[number]
 export type ProtocolType = Exclude<DialectType, 'sqlite'> | SQLiteProtocolType
 
 export function isMySQL(drizzle: unknown): drizzle is MySQL2Drizzle {
-    return instanceOf(drizzle, 'MySql2Database')
+    return instanceOf(drizzle, 'MySql2')
 }
 
 export function isPostgres(drizzle: unknown): drizzle is PostgresDrizzle {
-    return instanceOf(drizzle, 'NodePgDatabase')
+    return instanceOf(drizzle, 'NodePg')
 }
 
 export function isSQLite(drizzle: unknown): drizzle is SQLiteDrizzle {
-    return instanceOf(drizzle, 'LibSQLDatabase')
+    return instanceOf(drizzle, 'LibSQL')
 }
 
 export function isMySQLResult(obj: unknown): obj is MySQLExecuteResult {
@@ -42,7 +42,7 @@ export function isSQLiteResult(obj: unknown): obj is SQLiteExecuteResult {
     return typeof obj?.['rowsAffected'] === 'number'
 }
 
-function instanceOf(obj: unknown, ctorName: string) {
+function instanceOf(obj: unknown, clzNamePrefix: string) {
     return typeof obj === 'object'
-        && obj?.constructor?.name === ctorName
+        && (obj?.constructor?.name.startsWith(clzNamePrefix) ?? false)
 }
