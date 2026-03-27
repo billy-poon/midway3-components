@@ -1,4 +1,4 @@
-import { SerializeService as BaseService } from '@midway3-components/core'
+import { SerializeService as _SerializeService } from '@midway3-components/core'
 import { BaseModel, Pagination } from '@midway3-components/core/dist/data'
 import { BaseDataProvider } from '@midway3-components/core/dist/data/baseDataProvider'
 import { Config, Context, Inject, Provide } from '@midwayjs/core'
@@ -8,7 +8,7 @@ import { Link } from '../link'
 import { UrlService } from './urlService'
 
 @Provide()
-export class SerializeService extends BaseService {
+export class SerializeService extends _SerializeService {
     @Inject()
     ctx: Context
 
@@ -28,6 +28,8 @@ export class SerializeService extends BaseService {
 
     protected getRequestedPagination(): Pagination {
         const result = new WebPagination()
+            .configure(this.configOptions.pagination)
+
         result.urlFactory = this.urlService.path(this.ctx.path!)
 
         return result
