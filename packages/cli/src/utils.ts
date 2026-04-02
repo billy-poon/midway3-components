@@ -8,8 +8,8 @@ export function inferOptionType(
     parameterIndex?: number
 ): PositionalOptionsType | undefined {
     const type = parameterIndex != null
-        ? (getMethodParamTypes(clz, propertyKey) ?? [])[parameterIndex]
-        : getPropertyType(clz, propertyKey)
+        ? (getMethodParamTypes(clz.prototype, propertyKey) ?? [])[parameterIndex]
+        : getPropertyType(clz.prototype, propertyKey)
 
     if (type === String) {
         return 'string'
