@@ -1,5 +1,5 @@
 import { Class } from '@midway3-components/core'
-import { getMethodParamTypes, getPropertyType } from '@midwayjs/core'
+import { getMethodParamTypes } from '@midwayjs/core'
 import { PositionalOptionsType } from 'yargs'
 
 export function inferOptionType(
@@ -9,7 +9,7 @@ export function inferOptionType(
 ): PositionalOptionsType | undefined {
     const type = parameterIndex != null
         ? (getMethodParamTypes(clz.prototype, propertyKey) ?? [])[parameterIndex]
-        : getPropertyType(clz.prototype, propertyKey)
+        : Reflect.getMetadata('design:type', clz.prototype, propertyKey)
 
     if (type === String) {
         return 'string'
